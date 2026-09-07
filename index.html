@@ -335,6 +335,11 @@ button:disabled { opacity: 0.5; cursor: not-allowed; filter: none; }
      <input id="oshiRewardInput" type="number" min="0" placeholder="例如：50" onchange="saveOshiReward(this.value)">
    </div>
 
+   <div class="field">
+     <label>🎲 重骰值班成員扣除金額 (<span class="curr-unit">NT$</span>)</label>
+     <input id="dutyRerollCostInput" type="number" min="0" placeholder="例如：10" onchange="saveDutyRerollCost(this.value)">
+   </div>
+
    <h4 style="margin:16px 0 8px">成員列表 (可勾選多位設為推し)：</h4>
    <div id="memberList" class="member-list"></div>
    <div class="modalactions" style="margin-top:20px"><button onclick="closeMemberModal()">關閉</button></div>
@@ -394,13 +399,9 @@ button:disabled { opacity: 0.5; cursor: not-allowed; filter: none; }
 <!-- 簽到設定對話框 -->
 <div class="modal" id="checkinConfigModal">
  <div class="modalbox">
-   <h3>📅 設定簽到獎勵與重骰設定</h3>
+   <h3>📅 設定簽到獎勵</h3>
    <div class="field"><label>每日簽到獎勵 (<span class="curr-unit">NT$</span>)</label><input id="dailyRewardInput" type="number" min="0"></div>
    <div class="field"><label>滿 7 天加碼獎勵 (<span class="curr-unit">NT$</span>)</label><input id="weeklyRewardInput" type="number" min="0"></div>
-   
-   <hr style="border:0;border-top:1px solid var(--line);margin:16px 0">
-   
-   <div class="field"><label>重骰值班成員扣除金額 (<span class="curr-unit">NT$</span>)</label><input id="dutyRerollCostInput" type="number" min="0" placeholder="例如：10"></div>
 
    <div class="modalactions">
      <button onclick="closeCheckinConfigModal()">取消</button>
@@ -1127,21 +1128,17 @@ function openCheckinConfigModal() {
   document.getElementById("checkinConfigModal").classList.add("open");
   document.getElementById("dailyRewardInput").value = fromTWD(data.checkin.dailyReward ?? 20);
   document.getElementById("weeklyRewardInput").value = fromTWD(data.checkin.weeklyReward ?? 200);
-  document.getElementById("dutyRerollCostInput").value = fromTWD(data.dutyRerollCost ?? 10);
 }
 function closeCheckinConfigModal() { document.getElementById("checkinConfigModal").classList.remove("open"); }
 function saveCheckinConfig() {
   let dailyStr = document.getElementById("dailyRewardInput").value;
   let weeklyStr = document.getElementById("weeklyRewardInput").value;
-  let dutyCostStr = document.getElementById("dutyRerollCostInput").value;
   
   let daily = Number(dailyStr);
   let weekly = Number(weeklyStr);
-  let dutyCost = Number(dutyCostStr);
   
   data.checkin.dailyReward = (!isNaN(daily) && daily >= 0) ? toTWD(daily) : 0;
   data.checkin.weeklyReward = (!isNaN(weekly) && weekly >= 0) ? toTWD(weekly) : 0;
-  data.dutyRerollCost = (!isNaN(dutyCost) && dutyCost >= 0) ? toTWD(dutyCost) : 0;
   
   closeCheckinConfigModal();
   save();
@@ -1150,6 +1147,7 @@ function saveCheckinConfig() {
 function openMemberModal() { 
   document.getElementById("memberModal").classList.add("open"); 
   document.getElementById("oshiRewardInput").value = fromTWD(data.oshiReward ?? 50);
+  document.getElementById("dutyRerollCostInput").value = fromTWD(data.dutyRerollCost ?? 10);
   renderMemberList(); 
 }
 function closeMemberModal() { document.getElementById("memberModal").classList.remove("open"); }
@@ -1231,6 +1229,12 @@ function toggleOshi(id) {
 function saveOshiReward(val) {
   let num = Number(val);
   data.oshiReward = (!isNaN(num) && num >= 0) ? toTWD(num) : 0;
+  save();
+}
+
+function saveDutyRerollCost(val) {
+  let num = Number(val);
+  data.dutyRerollCost = (!isNaN(num) && num >= 0) ? toTWD(num) : 0;
   save();
 }
 
