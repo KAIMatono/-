@@ -3,6 +3,10 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
+<!-- 防止快取，確保重新整理或重開 App 時能讀到最新版 -->
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+<meta http-equiv="Pragma" content="no-cache">
+<meta http-equiv="Expires" content="0">
 <title>課金金庫｜Gacha Vault</title>
 <style>
 :root {
@@ -88,11 +92,17 @@ button:disabled { opacity: 0.5; cursor: not-allowed; filter: none; }
 
 /* 今日值班成員三聯卡樣式 */
 .duty-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-top: 8px; }
-.duty-card { position: relative; width: 100%; aspect-ratio: 3/4; border-radius: 12px; overflow: hidden; border: 1.5px solid var(--line); background: #121624; box-shadow: 0 4px 12px #0003; transition: transform 0.2s; }
+.duty-card { position: relative; width: 100%; aspect-ratio: 3/4.2; border-radius: 12px; overflow: hidden; border: 1.5px solid var(--line); background: #121624; box-shadow: 0 4px 12px #0003; transition: transform 0.2s; }
 .duty-card:hover { transform: translateY(-2px); border-color: var(--accent); }
 .duty-card.is-oshi { border-color: var(--gold); box-shadow: 0 0 12px rgba(255, 211, 106, 0.4); }
 .duty-card img { width: 100%; height: 100%; object-fit: cover; display: block; }
 .duty-card .member-tag { position: absolute; bottom: 0; inset-x: 0; background: linear-gradient(transparent, rgba(0,0,0,0.8)); color: white; font-size: 11px; font-weight: bold; text-align: center; padding: 12px 2px 4px; }
+
+/* 電腦版針對今日值班成員微調比例，讓高度更對齊左側 */
+body.force-desktop .duty-card { aspect-ratio: 3/4.6; }
+@media(min-width: 781px) {
+  body:not(.force-mobile) .duty-card { aspect-ratio: 3/4.6; }
+}
 
 .member-list, .task-manage-list, .cat-manage-list { display: flex; flex-direction: column; gap: 8px; max-height: 220px; overflow-y: auto; margin-top: 10px; }
 .member-item, .task-manage-item, .cat-manage-item { display: flex; align-items: center; justify-content: space-between; background: #121624; padding: 8px 12px; border-radius: 10px; border: 1px solid var(--line); }
@@ -131,10 +141,78 @@ button:disabled { opacity: 0.5; cursor: not-allowed; filter: none; }
 .task-btn.completed { background: #2f3b5c; color: var(--good); }
 
 /* 每日簽到樣式 */
-.checkin-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 6px; margin-top: 10px; }
-.checkin-day { background: #121624; border: 1px solid var(--line); border-radius: 10px; padding: 8px 4px; text-align: center; font-size: 12px; }
+.checkin-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 4px; margin-top: 8px; }
+.checkin-day { background: #121624; border: 1px solid var(--line); border-radius: 8px; padding: 6px 2px; text-align: center; font-size: 11px; }
 .checkin-day.done { border-color: var(--good); color: var(--good); background: rgba(82,214,160,0.1); }
 .checkin-day.today { border-color: var(--accent); font-weight: bold; }
+
+/* 手動切換排版模式樣式 */
+body.force-mobile .app { max-width: 480px !important; padding: 16px 10px 40px !important; }
+body.force-mobile .grid { grid-template-columns: 1fr !important; }
+body.force-mobile .stats { grid-template-columns: 1fr 1fr !important; }
+
+/* 手機版：將額度與本月統計併排為同一列，並縮小額度區塊尺寸 */
+body.force-mobile .hero-stats-row { display: grid; grid-template-columns: 1fr 1.1fr; gap: 8px; align-items: stretch; margin-bottom: 14px; }
+body.force-mobile .hero-compact { padding: 12px 14px !important; display: flex; flex-direction: column; justify-content: space-between; }
+body.force-mobile .hero-compact .balance { font-size: 26px !important; margin: 4px 0 8px !important; }
+body.force-mobile .hero-compact .muted { font-size: 11px; }
+body.force-mobile .hero-compact .actions { gap: 6px; margin-top: 0; }
+body.force-mobile .hero-compact button { padding: 6px 8px; font-size: 12px; border-radius: 8px; }
+body.force-mobile .hero-compact:after { display: none; }
+
+body.force-mobile .stats-compact { padding: 12px 12px !important; display: flex; flex-direction: column; justify-content: space-between; }
+body.force-mobile .stats-compact h2 { font-size: 14px !important; margin: 0 0 6px !important; }
+body.force-mobile .stats-grid-compact { display: grid; grid-template-columns: 1fr; gap: 4px; }
+body.force-mobile .stats-compact .stat { padding: 6px 10px; border-radius: 8px; display: flex; justify-content: space-between; align-items: center; }
+body.force-mobile .stats-compact .stat span { font-size: 11px; }
+body.force-mobile .stats-compact .stat b { font-size: 13px; margin-top: 0; }
+
+/* 手機版：將「課金目標」與「最近紀錄」併排為同一列，並縮短長度一半 */
+body.force-mobile .goal-log-row { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; align-items: stretch; }
+body.force-mobile .goal-log-compact { padding: 12px !important; margin-top: 0 !important; display: flex; flex-direction: column; justify-content: space-between; }
+body.force-mobile .goal-log-compact h2 { font-size: 14px !important; margin: 0 0 8px !important; }
+body.force-mobile .goal-log-compact .goal-scroll-area,
+body.force-mobile .goal-log-compact .log-scroll-area { max-height: 160px; overflow-y: auto; }
+body.force-mobile .goal-log-compact .goal,
+body.force-mobile .goal-log-compact .logrow { padding: 8px 0 !important; }
+body.force-mobile .goal-log-compact .goal-bar { width: 60px !important; }
+body.force-mobile .goal-log-compact .thumb { width: 32px; height: 32px; }
+
+/* 簽到與任務並排（手機版專用容器） */
+.checkin-task-row { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; align-items: stretch; }
+.checkin-task-compact { padding: 14px !important; margin-top: 0 !important; display: flex; flex-direction: column; justify-content: space-between; }
+.checkin-task-compact h2 { font-size: 15px !important; margin: 0 0 8px !important; }
+
+body.force-desktop .app { max-width: 1100px !important; }
+body.force-desktop .grid { display: grid !important; grid-template-columns: 1.35fr .65fr !important; }
+body.force-desktop .hero-stats-row { display: block !important; }
+body.force-desktop .hero-compact { padding: 22px !important; display: block !important; }
+body.force-desktop .hero-compact .balance { font-size: 52px !important; margin: 10px 0 15px !important; }
+body.force-desktop .hero-compact .muted { font-size: 14px !important; }
+body.force-desktop .hero-compact .actions { gap: 10px !important; margin-top: 10px !important; }
+body.force-desktop .hero-compact button { padding: 11px 16px !important; font-size: 14px !important; border-radius: 12px !important; }
+body.force-desktop .hero-compact:after { display: block !important; }
+
+body.force-desktop .stats-compact { padding: 22px !important; display: block !important; margin-top: 18px !important; }
+body.force-desktop .stats-compact h2 { font-size: 18px !important; margin: 0 0 13px !important; }
+body.force-desktop .stats-grid-compact { display: grid !important; grid-template-columns: repeat(3, 1fr) !important; gap: 10px !important; }
+body.force-desktop .stats-compact .stat { padding: 14px !important; border-radius: 14px !important; display: block !important; }
+body.force-desktop .stats-compact .stat span { font-size: 14px !important; }
+body.force-desktop .stats-compact .stat b { font-size: 18px !important; margin-top: 4px !important; }
+
+body.force-desktop .goal-log-row { display: block !important; }
+body.force-desktop .goal-log-compact { padding: 22px !important; margin-top: 18px !important; display: block !important; }
+body.force-desktop .goal-log-compact h2 { font-size: 18px !important; margin: 0 0 13px !important; }
+body.force-desktop .goal-log-compact .goal-scroll-area,
+body.force-desktop .goal-log-compact .log-scroll-area { max-height: 330px !important; overflow-y: auto !important; }
+body.force-desktop .goal-log-compact .goal,
+body.force-desktop .goal-log-compact .logrow { padding: 13px 0 !important; }
+body.force-desktop .goal-log-compact .goal-bar { width: 150px !important; }
+body.force-desktop .goal-log-compact .thumb { width: 48px !important; height: 48px !important; }
+
+body.force-desktop .checkin-task-row { display: block !important; }
+body.force-desktop .checkin-task-compact { padding: 22px !important; margin-top: 18px !important; display: block !important; }
+body.force-desktop .checkin-task-compact h2 { font-size: 18px !important; margin: 0 0 13px !important; }
 
 @media(max-width: 780px) {
   .grid { grid-template-columns: 1fr; }
@@ -142,26 +220,34 @@ button:disabled { opacity: 0.5; cursor: not-allowed; filter: none; }
   .top { align-items: flex-start; flex-wrap: wrap; gap: 10px; }
   .balance { font-size: 42px; }
   .goal-bar { width: 100px; }
+  .checkin-task-row { grid-template-columns: 1fr 1fr; }
 }
 </style>
 </head>
 <body class="bg-all">
 <div class="app">
-  <div class="top">
-    <div class="brand">🎮 課金<span>金庫</span></div>
-    <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
-      <!-- 幣別與匯率切換區 -->
-      <select id="currencySelect" onchange="changeCurrency(this.value)" style="padding:10px 12px;border-radius:12px;border:1px solid var(--line);background:var(--card2);color:white;font-weight:700">
-        <option value="TWD">🇹🇼 台幣 (NT$)</option>
-        <option value="JPY">🇯🇵 日幣 (￥)</option>
-      </select>
-      
-      <select id="gameFilter" onchange="render()" style="padding:10px 12px;border-radius:12px;border:1px solid var(--line);background:var(--card2);color:white;font-weight:700">
-      </select>
-      <button id="undoBtn" onclick="undo()" disabled style="padding:10px 12px;">↩️ 上一步</button>
-      <button onclick="openCatModal()" style="padding:10px 12px;">⚙️ 設定</button>
-      <button onclick="resetBalanceToZero()" style="background:#4a3220;color:#ffd36a">餘額歸零</button>
-      <button onclick="resetAll()">重置資料</button>
+  <!-- 標題區塊 -->
+  <div class="top" style="flex-direction: column; align-items: stretch; gap: 10px;">
+    <!-- 第一行：課金金庫、切換為電腦版、幣值、遊戲類別 -->
+    <div style="display: flex; justify-content: space-between; align-items: center; width: 100%; flex-wrap: wrap; gap: 6px;">
+      <div class="brand" style="font-size: 20px;">🎮 課金<span>金庫</span></div>
+      <div style="display: flex; gap: 6px; align-items: center; flex-wrap: wrap;">
+        <button id="viewToggleBtn" onclick="toggleViewMode()" style="background:#3a3278;color:#ffd36a;padding:8px 10px;font-size:13px;">💻 切換為電腦版</button>
+        <select id="currencySelect" onchange="changeCurrency(this.value)" style="padding:8px 8px;border-radius:12px;border:1px solid var(--line);background:var(--card2);color:white;font-weight:700;font-size:13px;">
+          <option value="TWD">NT$</option>
+          <option value="JPY">￥</option>
+        </select>
+        <select id="gameFilter" onchange="render()" style="padding:8px 8px;border-radius:12px;border:1px solid var(--line);background:var(--card2);color:white;font-weight:700;font-size:13px;">
+        </select>
+      </div>
+    </div>
+
+    <!-- 第二行：上一步、設定、餘額歸零、重置資料 -->
+    <div style="display: flex; gap: 6px; align-items: center; justify-content: flex-end; width: 100%; flex-wrap: wrap;">
+      <button id="undoBtn" onclick="undo()" disabled style="padding:8px 12px;font-size:13px;">↩️ 上一步</button>
+      <button onclick="openCatModal()" style="padding:8px 12px;font-size:13px;">⚙️ 設定</button>
+      <button onclick="resetBalanceToZero()" style="background:#4a3220;color:#ffd36a;padding:8px 12px;font-size: 13px;">餘額歸零</button>
+      <button onclick="resetAll()" style="padding:8px 12px;font-size: 13px;">重置資料</button>
     </div>
   </div>
 
@@ -173,37 +259,49 @@ button:disabled { opacity: 0.5; cursor: not-allowed; filter: none; }
 
   <div class="grid">
     <main>
-      <section class="card hero">
-        <div class="muted">目前可用課金額度</div>
-        <div class="balance" id="balance">NT$ 0</div>
-        <div class="actions">
-          <button class="primary" onclick="openModal('add')">📥 儲值 ＋</button>
-          <button class="danger" onclick="openModal('spend')">💸 課金 －</button>
-        </div>
-      </section>
+      <!-- 額度與本月統計併排列 -->
+      <div class="hero-stats-row">
+        <section class="card hero hero-compact">
+          <div class="muted">目前可用課金額度</div>
+          <div class="balance" id="balance">NT$ 0</div>
+          <div class="actions">
+            <button class="primary" onclick="openModal('add')">📥 儲值</button>
+            <button class="danger" onclick="openModal('spend')">💸 課金</button>
+          </div>
+        </section>
 
-      <section class="card section">
-        <h2>📊 本月統計</h2>
-        <div class="stats" style="margin-top:0">
-          <div class="stat"><span class="muted">本月總儲值</span><b id="monthSaved" class="plus">NT$ 0</b></div>
-          <div class="stat"><span class="muted">本月總課金</span><b id="monthSpent" class="minus">NT$ 0</b></div>
-          <div class="stat"><span class="muted">本月淨變化</span><b id="monthNet">NT$ 0</b></div>
-        </div>
-      </section>
+        <section class="card section stats-compact" style="margin-top:0">
+          <h2 style="margin:0 0 8px">📊 本月統計</h2>
+          <div class="stats-grid-compact">
+            <div class="stat"><span class="muted">總儲值</span><b id="monthSaved" class="plus">NT$ 0</b></div>
+            <div class="stat"><span class="muted">總課金</span><b id="monthSpent" class="minus">NT$ 0</b></div>
+            <div class="stat"><span class="muted">淨變化</span><b id="monthNet">NT$ 0</b></div>
+          </div>
+        </section>
+      </div>
 
-      <section class="card section">
-        <h2>🎯 課金目標</h2>
-        <div id="goals"></div>
-        <button style="width:100%;margin-top:10px" onclick="openModal('goal')">＋ 新增課金目標</button>
-      </section>
+      <!-- 課金目標與最近紀錄並排 -->
+      <div class="goal-log-row">
+        <section class="card section goal-log-compact">
+          <div>
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
+              <h2 style="margin:0">🎯 課金目標</h2>
+              <button style="padding:3px 6px;font-size:11px" onclick="openModal('goal')">＋ 新增</button>
+            </div>
+            <div id="goals" class="goal-scroll-area"></div>
+          </div>
+        </section>
 
-      <section class="card section">
-        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:13px">
-          <h2 style="margin:0">📜 最近紀錄</h2>
-          <button onclick="clearAllLogs()" style="padding:4px 8px;font-size:12px;background:#4a2032;color:#ffb1c5">全部刪除</button>
-        </div>
-        <div class="log" id="log"></div>
-      </section>
+        <section class="card section goal-log-compact">
+          <div>
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
+              <h2 style="margin:0">📜 最近紀錄</h2>
+              <button onclick="clearAllLogs()" style="padding:3px 6px;font-size:11px;background:#4a2032;color:#ffb1c5">清空</button>
+            </div>
+            <div class="log log-scroll-area" id="log"></div>
+          </div>
+        </section>
+      </div>
     </main>
 
     <aside>
@@ -221,43 +319,46 @@ button:disabled { opacity: 0.5; cursor: not-allowed; filter: none; }
         </div>
       </section>
 
-      <!-- 📅 每日簽到 -->
-      <section class="card section">
-        <div style="display:flex;justify-content:space-between;align-items:center">
-          <h2 style="margin:0">📅 每日簽到</h2>
-          <div style="display:flex;gap:4px">
-            <button onclick="clearCheckinData()" title="" style="padding:4px 8px;font-size:12px;background:#4a2032;color:#ffb1c5">🗑️</button>
-            <button onclick="openCheckinConfigModal()" style="padding:4px 8px;font-size:12px">設定獎勵</button>
+      <!-- 📅 每日簽到與 📋 每日任務併排為同一列 -->
+      <div class="checkin-task-row section">
+        <section class="card checkin-task-compact">
+          <div>
+            <div style="display:flex;justify-content:space-between;align-items:center">
+              <h2 style="margin:0">📅 簽到</h2>
+              <div style="display:flex;gap:4px">
+                <button onclick="clearCheckinData()" title="清除簽到" style="padding:3px 6px;font-size:11px;background:#4a2032;color:#ffb1c5">🗑️</button>
+                <button onclick="openCheckinConfigModal()" style="padding:3px 6px;font-size:11px">設定</button>
+              </div>
+            </div>
+            <div class="checkin-grid" id="checkinGrid"></div>
           </div>
-        </div>
-        <div class="checkin-grid" id="checkinGrid"></div>
-        <button id="checkinBtn" class="primary" style="width:100%;margin-top:12px" onclick="doCheckin()">每日簽到</button>
-      </section>
+          <button id="checkinBtn" class="primary" style="width:100%;margin-top:10px;padding:8px;font-size:12px" onclick="doCheckin()">每日簽到</button>
+        </section>
 
-      <!-- 📋 每日任務 -->
-      <section class="card section">
-        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
-          <div style="display:flex;align-items:center;gap:6px">
-            <h2 style="margin:0">每日任務</h2>
-            <button id="rerollTaskBtn" onclick="rerollDailyTasks()" style="padding:4px 8px;font-size:13px;background:var(--accent)">🎲</button>
-          </div>
-          <button onclick="openTaskModal()" style="padding:4px 8px;font-size:12px">⚙️ 任務設定</button>
-        </div>
-        
-        <div style="font-size:11px;color:var(--muted);margin-bottom:8px" id="taskCostDesc">每次重骰扣除 10 元，每日 0:00 自動更新任務</div>
+        <section class="card checkin-task-compact">
+          <div>
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">
+              <div style="display:flex;align-items:center;gap:4px">
+                <h2 style="margin:0">📋 任務</h2>
+                <button id="rerollTaskBtn" onclick="rerollDailyTasks()" style="padding:3px 6px;font-size:11px;background:var(--accent)">🎲</button>
+              </div>
+              <button onclick="openTaskModal()" style="padding:3px 6px;font-size:11px">⚙️</button>
+            </div>
+            
+            <div style="margin-bottom:8px">
+              <div style="display:flex;justify-content:space-between;font-size:11px;color:var(--muted);margin-bottom:2px">
+                <span>獎勵: <b id="allTaskRewardText" style="color:var(--gold)">NT$ 100</b></span>
+                <span id="taskProgressText">0 / 3</span>
+              </div>
+              <div style="height:5px;background:#2d3754;border-radius:99px;overflow:hidden">
+                <div id="taskProgressBar" style="width:0%;height:100%;background:var(--good);transition:width 0.3s"></div>
+              </div>
+            </div>
 
-        <div style="margin-bottom:12px">
-          <div style="display:flex;justify-content:space-between;font-size:13px;color:var(--muted);margin-bottom:4px">
-            <span>全完成獎勵：<b id="allTaskRewardText" style="color:var(--gold)">NT$ 100</b></span>
-            <span id="taskProgressText">0 / 3</span>
+            <div id="taskList"></div>
           </div>
-          <div style="height:6px;background:#2d3754;border-radius:99px;overflow:hidden">
-            <div id="taskProgressBar" style="width:0%;height:100%;background:var(--good);transition:width 0.3s"></div>
-          </div>
-        </div>
-
-        <div id="taskList"></div>
-      </section>
+        </section>
+      </div>
     </aside>
   </div>
 </div>
@@ -440,6 +541,7 @@ let data = {
 };
 
 let historyStack = [];
+let currentViewMode = localStorage.getItem("gacha-view-mode") || "auto"; // "auto", "mobile", "desktop"
 
 try {
   const savedData = JSON.parse(localStorage.getItem(KEY));
@@ -463,6 +565,39 @@ try {
   }
 } catch (e) {
   console.error("讀取本地資料失敗，重置為預設值", e);
+}
+
+function toggleViewMode() {
+  if (currentViewMode === "auto" || currentViewMode === "mobile") {
+    currentViewMode = "desktop";
+  } else {
+    currentViewMode = "mobile";
+  }
+  applyViewMode();
+}
+
+function applyViewMode() {
+  let body = document.body;
+  let btn = document.getElementById("viewToggleBtn");
+  
+  body.classList.remove("force-mobile", "force-desktop");
+  
+  if (currentViewMode === "desktop") {
+    body.classList.add("force-desktop");
+    if (btn) {
+      btn.textContent = "📱 切換為手機版";
+    }
+  } else if (currentViewMode === "mobile") {
+    body.classList.add("force-mobile");
+    if (btn) {
+      btn.textContent = "💻 切換為電腦版";
+    }
+  } else {
+    if (btn) {
+      btn.textContent = "💻 切換為電腦版";
+    }
+  }
+  localStorage.setItem("gacha-view-mode", currentViewMode);
 }
 
 function money(nInTWD) {
@@ -610,10 +745,11 @@ function updateBackground(filter) {
 
   if (customBg) {
     document.body.style.backgroundImage = `linear-gradient(rgba(10,13,24,${maskAlpha}), rgba(10,13,24,${maskAlpha})), url('${customBg}')`;
-    document.body.className = '';
+    document.body.className = currentViewMode === "mobile" ? 'force-mobile' : (currentViewMode === "desktop" ? 'force-desktop' : '');
   } else {
     document.body.style.backgroundImage = '';
-    document.body.className = `bg-${filter}`;
+    let modeClass = currentViewMode === "mobile" ? 'force-mobile' : (currentViewMode === "desktop" ? 'force-desktop' : '');
+    document.body.className = `bg-${filter} ${modeClass}`.trim();
     document.body.style.filter = `brightness(${0.4 + opacity * 0.6})`;
   }
 }
@@ -867,11 +1003,7 @@ function renderTasks() {
   let activeIds = getDailyActiveTasks();
   let container = document.getElementById("taskList");
   let rerollBtn = document.getElementById("rerollTaskBtn");
-  let costDesc = document.getElementById("taskCostDesc");
-  if (costDesc) {
-    let cost = Number(data.taskRerollCost ?? 10);
-    costDesc.textContent = `每次重骰扣除 ${money(cost)}，每日 0:00 自動更新任務`;
-  }
+
   if (!container) return;
 
   let tasks = data.tasks || [];
@@ -890,17 +1022,17 @@ function renderTasks() {
   }
 
   if (activeTasks.length === 0) {
-    container.innerHTML = `<div class="empty">任務庫少於 3 個任務，請先至任務設定新增</div>`;
+    container.innerHTML = `<div class="empty" style="padding:10px 0;font-size:11px">任務庫少於 3 個任務</div>`;
     return;
   }
 
   container.innerHTML = activeTasks.map(t => {
     let isDone = completedList.includes(t.id);
     return `
-      <div class="task-item ${isDone ? 'done' : ''}">
-        <div class="task-title" title="${esc(t.title)}">${esc(t.title)}</div>
-        <button class="task-btn ${isDone ? 'completed' : ''}" ${isDone ? 'disabled' : ''} onclick="completeTask(${t.id})">
-          ${isDone ? '✓ 已完成' : '完成'}
+      <div class="task-item ${isDone ? 'done' : ''}" style="padding:5px 8px;margin-bottom:4px">
+        <div class="task-title" style="font-size:11px" title="${esc(t.title)}">${esc(t.title)}</div>
+        <button class="task-btn ${isDone ? 'completed' : ''}" style="padding:3px 6px;font-size:10px" ${isDone ? 'disabled' : ''} onclick="completeTask(${t.id})">
+          ${isDone ? '✓' : '完成'}
         </button>
       </div>
     `;
@@ -919,15 +1051,15 @@ function renderCheckin() {
   btn.textContent = isCheckedToday ? "今日已簽到 ✓" : "每日簽到";
 
   let history = data.checkin.history || [];
-  let days = ["一", "二", "三", "四", "五", "六", "日"];
+  let days = ["週一", "週二", "週三", "週四", "週五", "週六", "週日"];
   
   grid.innerHTML = days.map((dayName, idx) => {
     let isDone = history.length > idx;
     let isToday = history.length === idx && !isCheckedToday;
     return `
       <div class="checkin-day ${isDone ? 'done' : ''} ${isToday ? 'today' : ''}">
-        <div>週${dayName}</div>
-        <div style="font-weight:bold;margin-top:2px">${isDone ? '✓' : idx + 1}</div>
+        <div>${dayName}</div>
+        <div style="font-weight:bold;margin-top:1px">${isDone ? '✓' : idx + 1}</div>
       </div>
     `;
   }).join("");
@@ -1012,7 +1144,7 @@ function render() {
       let imgHtml = g.img ? `<img src="${g.img}" class="thumb">` : '';
       let catNameStr = gameName(g.game);
       return `<div class="goal"><div style="display:flex;gap:12px;align-items:center;flex:1">${imgHtml}<div><div class="goal-name">${catNameStr ? catNameStr + " · " : ""}${esc(g.name)}</div><div class="muted">${money(g.current)} / ${money(g.target)}</div><div class="bar goal-bar" style="height:6px;background:#2d3754;border-radius:99px;margin-top:4px"><div class="fill" style="width:${p}%;height:100%;background:linear-gradient(90deg,#7d6cff,#c29cff);border-radius:99px"></div></div></div></div><div><button class="primary" onclick="openFundModal(${g._i})">目標</button><button class="btn-del" onclick="deleteGoal(${g._i})">✕</button></div></div>`;
-    }).join("") : '<div class="empty">還沒有課金目標，建立一個來規劃花費吧。</div>';
+    }).join("") : '<div class="empty">還沒有課金目標。</div>';
   }
 
   let logContainer = document.getElementById("log");
@@ -1463,6 +1595,7 @@ document.addEventListener("DOMContentLoaded", () => {
   updateUndoBtn();
   updateDropdowns();
   updateCurrencyUnitUI();
+  applyViewMode();
   fetchBotRate();
   render();
 });
