@@ -1,0 +1,1471 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>課金金庫｜Gacha Vault</title>
+<style>
+:root {
+  --bg: #1a1f36;
+  --card: #1f263e;
+  --card2: #293250;
+  --text: #f4f6ff;
+  --muted: #a0abc0;
+  --line: #323d5e;
+  --accent: #8b7cff;
+  --good: #52d6a0;
+  --bad: #ff6f91;
+  --gold: #ffd36a;
+}
+* { box-sizing: border-box; }
+body {
+  margin: 0;
+  background-size: cover;
+  background-position: center;
+  background-attachment: fixed;
+  color: var(--text);
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", "Noto Sans TC", sans-serif;
+  transition: background 0.5s ease;
+  min-height: 100vh;
+}
+
+body.bg-all { background: radial-gradient(circle at 20% 0%, #3a3278 0%, #1a1f36 70%), var(--bg); }
+body.bg-uni { background: linear-gradient(135deg, rgba(25, 48, 58, 0.7), rgba(35, 22, 60, 0.7)), radial-gradient(circle at 80% 20%, #1f6b5b 0%, #1a1f36 70%); }
+body.bg-sakukore { background: linear-gradient(135deg, rgba(60, 25, 45, 0.7), rgba(25, 20, 38, 0.7)), radial-gradient(circle at 20% 80%, #7a2247 0%, #1a1f36 70%); }
+
+.app { max-width: 1100px; margin: auto; padding: 28px 18px 50px; }
+.top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; }
+.brand { font-size: 25px; font-weight: 800; }
+.brand span { color: var(--accent); }
+button { border: 0; border-radius: 12px; padding: 11px 16px; color: white; background: var(--card2); cursor: pointer; font-weight: 700; }
+button:hover { filter: brightness(1.15); }
+button:disabled { opacity: 0.5; cursor: not-allowed; filter: none; }
+
+.grid { display: grid; grid-template-columns: 1.35fr .65fr; gap: 18px; }
+.card { background: linear-gradient(145deg, rgba(31, 38, 62, 0.88), rgba(25, 31, 50, 0.88)); backdrop-filter: blur(12px); border: 1px solid var(--line); border-radius: 20px; padding: 22px; box-shadow: 0 12px 35px #0004; }
+.balance { font-size: 52px; font-weight: 900; margin: 10px 0 15px; }
+.muted { color: var(--muted); }
+.hero { position: relative; overflow: hidden; }
+.hero:after { content: "💎"; position: absolute; right: 35px; top: 25px; font-size: 90px; opacity: .15; }
+.actions { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 10px; }
+.primary { background: linear-gradient(135deg, #7565ff, #a56dff); }
+.danger { background: #4a2032; color: #ffb1c5; }
+.stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-top: 12px; }
+.stat { background: #151a2b; border: 1px solid var(--line); border-radius: 14px; padding: 14px; }
+.stat b { display: block; font-size: 18px; margin-top: 4px; }
+.section { margin-top: 18px; }
+.section h2 { font-size: 18px; margin: 0 0 13px; }
+.goal { display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 13px 0; border-bottom: 1px solid var(--line); }
+.goal:last-child { border: 0; }
+.goal-name { font-weight: 800; }
+.goal-bar { width: 150px; }
+.goal button { padding: 7px 10px; font-size: 12px; margin-left: 4px; }
+.log { max-height: 330px; overflow: auto; }
+.logrow { display: flex; justify-content: space-between; align-items: center; gap: 12px; padding: 12px 0; border-bottom: 1px solid var(--line); }
+.plus { color: var(--good); }
+.minus { color: var(--bad); }
+
+.empty { color: var(--muted); padding: 18px 0; text-align: center; }
+
+.modal { position: fixed; inset: 0; background: #0008; display: none; align-items: center; justify-content: center; padding: 18px; z-index: 99; }
+.modal.open { display: flex; }
+.modalbox { width: min(460px, 100%); background: #1b2238; border: 1px solid var(--line); border-radius: 20px; padding: 22px; max-height: 90vh; overflow-y: auto; }
+.modalbox h3 { margin-top: 0; }
+.field { margin: 13px 0; }
+.field label { display: block; color: var(--muted); font-size: 13px; margin-bottom: 6px; }
+.field input, .field select { width: 100%; padding: 12px; border-radius: 10px; border: 1px solid var(--line); background: #121624; color: white; font-size: 16px; }
+.modalactions { display: flex; gap: 9px; justify-content: flex-end; margin-top: 18px; }
+.btn-del { background: none; border: none; color: var(--muted); cursor: pointer; padding: 2px 6px; font-size: 12px; }
+.btn-del:hover { color: var(--bad); }
+.btn-edit { background: none; border: none; color: var(--accent); cursor: pointer; padding: 2px 6px; font-size: 12px; }
+.btn-edit:hover { filter: brightness(1.2); }
+.thumb { width: 48px; height: 48px; border-radius: 8px; object-fit: cover; border: 1px solid var(--line); }
+.bg-btn-group { display: flex; gap: 6px; margin-top: 8px; }
+.bg-btn-group button { padding: 6px 10px; font-size: 12px; background: #151a2b; border: 1px solid var(--line); }
+.slider-container { margin-top: 12px; }
+.slider-container label { font-size: 12px; color: var(--muted); display: flex; justify-content: space-between; }
+.slider-container input { width: 100%; margin-top: 4px; }
+
+/* 今日值班成員三聯卡樣式 */
+.duty-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-top: 8px; }
+.duty-card { position: relative; width: 100%; aspect-ratio: 3/4; border-radius: 12px; overflow: hidden; border: 1.5px solid var(--line); background: #121624; box-shadow: 0 4px 12px #0003; transition: transform 0.2s; }
+.duty-card:hover { transform: translateY(-2px); border-color: var(--accent); }
+.duty-card.is-oshi { border-color: var(--gold); box-shadow: 0 0 12px rgba(255, 211, 106, 0.4); }
+.duty-card img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.duty-card .member-tag { position: absolute; bottom: 0; inset-x: 0; background: linear-gradient(transparent, rgba(0,0,0,0.8)); color: white; font-size: 11px; font-weight: bold; text-align: center; padding: 12px 2px 4px; }
+
+.member-list, .task-manage-list, .cat-manage-list { display: flex; flex-direction: column; gap: 8px; max-height: 220px; overflow-y: auto; margin-top: 10px; }
+.member-item, .task-manage-item, .cat-manage-item { display: flex; align-items: center; justify-content: space-between; background: #121624; padding: 8px 12px; border-radius: 10px; border: 1px solid var(--line); }
+
+/* 每日任務樣式 - 嚴格單行不換行配置 */
+.task-item { 
+  display: grid; 
+  grid-template-columns: 1fr auto; 
+  align-items: center; 
+  gap: 8px; 
+  padding: 7px 10px; 
+  background: #151a2b; 
+  border: 1px solid var(--line); 
+  border-radius: 10px; 
+  margin-bottom: 6px; 
+  width: 100%;
+  overflow: hidden;
+}
+.task-item.done { opacity: 0.55; }
+.task-title {
+  font-size: 12px;
+  font-weight: 600;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  min-width: 0;
+}
+.task-btn { 
+  padding: 4px 8px; 
+  font-size: 11px; 
+  background: var(--accent); 
+  border-radius: 6px;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+.task-btn.completed { background: #2f3b5c; color: var(--good); }
+
+/* 每日簽到樣式 */
+.checkin-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 6px; margin-top: 10px; }
+.checkin-day { background: #121624; border: 1px solid var(--line); border-radius: 10px; padding: 8px 4px; text-align: center; font-size: 12px; }
+.checkin-day.done { border-color: var(--good); color: var(--good); background: rgba(82,214,160,0.1); }
+.checkin-day.today { border-color: var(--accent); font-weight: bold; }
+
+@media(max-width: 780px) {
+  .grid { grid-template-columns: 1fr; }
+  .stats { grid-template-columns: 1fr 1fr; }
+  .top { align-items: flex-start; flex-wrap: wrap; gap: 10px; }
+  .balance { font-size: 42px; }
+  .goal-bar { width: 100px; }
+}
+</style>
+</head>
+<body class="bg-all">
+<div class="app">
+  <div class="top">
+    <div class="brand">🎮 課金<span>金庫</span></div>
+    <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
+      <!-- 幣別與匯率切換區 -->
+      <select id="currencySelect" onchange="changeCurrency(this.value)" style="padding:10px 12px;border-radius:12px;border:1px solid var(--line);background:var(--card2);color:white;font-weight:700">
+        <option value="TWD">🇹🇼 台幣 (NT$)</option>
+        <option value="JPY">🇯🇵 日幣 (￥)</option>
+      </select>
+      
+      <select id="gameFilter" onchange="render()" style="padding:10px 12px;border-radius:12px;border:1px solid var(--line);background:var(--card2);color:white;font-weight:700">
+      </select>
+      <button id="undoBtn" onclick="undo()" disabled style="padding:10px 12px;">↩️ 上一步</button>
+      <button onclick="openCatModal()" style="padding:10px 12px;">⚙️ 設定</button>
+      <button onclick="resetBalanceToZero()" style="background:#4a3220;color:#ffd36a">餘額歸零</button>
+      <button onclick="resetAll()">重置資料</button>
+    </div>
+  </div>
+
+  <!-- 匯率提示資訊條 -->
+  <div style="font-size:12px;color:var(--muted);margin-bottom:12px;display:flex;justify-content:space-between;align-items:center;background:#151a2b;padding:6px 12px;border-radius:8px;border:1px solid var(--line)">
+    <span>🏦 台灣銀行日幣現鈔賣出匯率：<b id="rateDisplay" style="color:var(--gold)">1 JPY ≈ 0.21 TWD</b></span>
+    <button onclick="fetchBotRate()" style="padding:2px 8px;font-size:11px;background:none;border:1px solid var(--line);color:var(--muted)">🔄 更新匯率</button>
+  </div>
+
+  <div class="grid">
+    <main>
+      <section class="card hero">
+        <div class="muted">目前可用課金額度</div>
+        <div class="balance" id="balance">NT$ 0</div>
+        <div class="actions">
+          <button class="primary" onclick="openModal('add')">📥 儲值 ＋</button>
+          <button class="danger" onclick="openModal('spend')">💸 課金 －</button>
+        </div>
+      </section>
+
+      <section class="card section">
+        <h2>📊 本月統計</h2>
+        <div class="stats" style="margin-top:0">
+          <div class="stat"><span class="muted">本月總儲值</span><b id="monthSaved" class="plus">NT$ 0</b></div>
+          <div class="stat"><span class="muted">本月總課金</span><b id="monthSpent" class="minus">NT$ 0</b></div>
+          <div class="stat"><span class="muted">本月淨變化</span><b id="monthNet">NT$ 0</b></div>
+        </div>
+      </section>
+
+      <section class="card section">
+        <h2>🎯 課金目標</h2>
+        <div id="goals"></div>
+        <button style="width:100%;margin-top:10px" onclick="openModal('goal')">＋ 新增課金目標</button>
+      </section>
+
+      <section class="card section">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:13px">
+          <h2 style="margin:0">📜 最近紀錄</h2>
+          <button onclick="clearAllLogs()" style="padding:4px 8px;font-size:12px;background:#4a2032;color:#ffb1c5">全部刪除</button>
+        </div>
+        <div class="log" id="log"></div>
+      </section>
+    </main>
+
+    <aside>
+      <section class="card">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
+          <h2 style="margin:0">🌟 今日值班成員</h2>
+          <div style="display:flex;gap:4px">
+            <button onclick="rerollDutyMembers()" style="padding:4px 8px;font-size:13px;background:var(--accent)">🎲</button>
+            <button onclick="openMemberModal()" style="padding:4px 8px;font-size:12px">管理成員</button>
+          </div>
+        </div>
+        <div style="font-size:11px;color:var(--muted);margin-bottom:8px" id="dutyCostDesc">每次重骰扣除 10 元，每日 0:00 自動更新成員</div>
+        <div id="dutyMemberArea">
+          <div class="empty">尚無成員照片，點擊右上角「管理成員」上傳吧！</div>
+        </div>
+      </section>
+
+      <!-- 📅 每日簽到 -->
+      <section class="card section">
+        <div style="display:flex;justify-content:space-between;align-items:center">
+          <h2 style="margin:0">📅 每日簽到</h2>
+          <div style="display:flex;gap:4px">
+            <button onclick="clearCheckinData()" title="" style="padding:4px 8px;font-size:12px;background:#4a2032;color:#ffb1c5">🗑️</button>
+            <button onclick="openCheckinConfigModal()" style="padding:4px 8px;font-size:12px">設定獎勵</button>
+          </div>
+        </div>
+        <div class="checkin-grid" id="checkinGrid"></div>
+        <button id="checkinBtn" class="primary" style="width:100%;margin-top:12px" onclick="doCheckin()">每日簽到</button>
+      </section>
+
+      <!-- 📋 每日任務 -->
+      <section class="card section">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
+          <div style="display:flex;align-items:center;gap:6px">
+            <h2 style="margin:0">每日任務</h2>
+            <button id="rerollTaskBtn" onclick="rerollDailyTasks()" style="padding:4px 8px;font-size:13px;background:var(--accent)">🎲</button>
+          </div>
+          <button onclick="openTaskModal()" style="padding:4px 8px;font-size:12px">⚙️ 任務設定</button>
+        </div>
+        
+        <div style="font-size:11px;color:var(--muted);margin-bottom:8px" id="taskCostDesc">每次重骰扣除 10 元，每日 0:00 自動更新任務</div>
+
+        <div style="margin-bottom:12px">
+          <div style="display:flex;justify-content:space-between;font-size:13px;color:var(--muted);margin-bottom:4px">
+            <span>全完成獎勵：<b id="allTaskRewardText" style="color:var(--gold)">NT$ 100</b></span>
+            <span id="taskProgressText">0 / 3</span>
+          </div>
+          <div style="height:6px;background:#2d3754;border-radius:99px;overflow:hidden">
+            <div id="taskProgressBar" style="width:0%;height:100%;background:var(--good);transition:width 0.3s"></div>
+          </div>
+        </div>
+
+        <div id="taskList"></div>
+      </section>
+    </aside>
+  </div>
+</div>
+
+<!-- 一般對話框 -->
+<div class="modal" id="modal">
+ <div class="modalbox">
+   <h3 id="modalTitle">📥 儲值金庫</h3>
+   <div class="field"><label id="amountLabel">金額 (<span class="curr-unit">NT$</span>)</label><input id="amount" type="number" min="0" step="1" placeholder="例如 300"></div>
+   <div class="field" id="gameField"><label>分類</label>
+     <select id="game"></select>
+   </div>
+   <div class="field"><label id="noteLabel">備註</label><input id="note" placeholder="例如：月卡 / 周年禮包"></div>
+   <div class="field"><label>圖片截圖 (可選)</label><input id="imageInput" type="file" accept="image/*"></div>
+   <div class="modalactions"><button onclick="closeModal()">取消</button><button class="primary" onclick="submitModal()">確認</button></div>
+ </div>
+</div>
+
+<!-- 目標快速扣款對話框 -->
+<div class="modal" id="fundModal">
+ <div class="modalbox">
+   <h3 id="fundModalTitle">🎯 達成課金目標</h3>
+   <input type="hidden" id="fundGoalIndex">
+   <div class="field"><label>扣款金額 (<span class="curr-unit">NT$</span>)</label><input id="fundAmount" type="number" min="0" step="1" placeholder="輸入本次花費金額"></div>
+   <div class="field"><label>花費備註 / 抽卡結果</label><input id="fundNote" placeholder="例如：10連抽 / 必得券包"></div>
+   <div class="field"><label>更新截圖 (可選)</label><input id="fundImageInput" type="file" accept="image/*"></div>
+   <div class="modalactions">
+     <button onclick="closeFundModal()">取消</button>
+     <button class="primary" onclick="submitFundGoal()">確認扣款並計入目標</button>
+   </div>
+ </div>
+</div>
+
+<!-- 分類與背景設定對話框 -->
+<div class="modal" id="catModal">
+ <div class="modalbox">
+   <h3>⚙️ 分類與背景設定</h3>
+   <div class="field"><label>新增分類</label><input id="catName" placeholder="例如：UNI'S ON AIR / サクコレ"></div>
+   <button class="primary" style="width:100%;margin-top:2px" onclick="addCategory()">新增分類</button>
+   <h4 style="margin:16px 0 8px">分類列表：</h4>
+   <div id="catManageList" class="cat-manage-list"></div>
+
+   <hr style="border:0;border-top:1px solid var(--line);margin:20px 0">
+
+   <h4>🖼️ 桌布與畫面調光</h4>
+   <div class="muted" style="font-size:12px;margin-bottom:8px">為目前的分類自訂獨立的背景壁紙：</div>
+
+   <div class="slider-container">
+     <label><span>背景亮度</span><span id="bgOpacityVal">100%</span></label>
+     <input type="range" id="bgOpacitySlider" min="20" max="100" value="100" oninput="changeBgOpacity(this.value)">
+   </div>
+
+   <div class="bg-btn-group" style="margin-top:12px">
+     <button class="primary" style="flex:1" onclick="triggerBgUpload()">上傳背景壁紙</button>
+     <button onclick="clearCurrentBg()">重置為預設背景</button>
+   </div>
+   <input type="file" id="bgInput" accept="image/*" style="display:none" onchange="handleBgUpload(event)">
+
+   <div class="modalactions" style="margin-top:24px"><button onclick="closeCatModal()">關閉</button></div>
+ </div>
+</div>
+
+<!-- 成員管理對話框 -->
+<div class="modal" id="memberModal">
+ <div class="modalbox">
+   <h3>🌟 管理成員與推し</h3>
+   <div class="field"><label>成員姓名</label><input id="memberNameInput" placeholder="例如：的野美青 / 森田ひかる"></div>
+   <div class="field"><label>成員照片</label><input id="memberImgInput" type="file" accept="image/*"></div>
+   <button class="primary" style="width:100%;margin-top:4px" onclick="addMember()">新增成員</button>
+
+   <hr style="border:0;border-top:1px solid var(--line);margin:16px 0">
+
+   <div class="field">
+     <label>👑 抽中推し時的加碼獎勵 (<span class="curr-unit">NT$</span>)</label>
+     <input id="oshiRewardInput" type="number" min="0" placeholder="例如：50" onchange="saveOshiReward(this.value)">
+   </div>
+
+   <div class="field">
+     <label>🎲 重骰值班成員扣除金額 (<span class="curr-unit">NT$</span>)</label>
+     <input id="dutyRerollCostInput" type="number" min="0" placeholder="例如：10" onchange="saveDutyRerollCost(this.value)">
+   </div>
+
+   <h4 style="margin:16px 0 8px">成員列表 (可勾選多位設為推し)：</h4>
+   <div id="memberList" class="member-list"></div>
+   <div class="modalactions" style="margin-top:20px"><button onclick="closeMemberModal()">關閉</button></div>
+ </div>
+</div>
+
+<!-- 編輯成員對話框 -->
+<div class="modal" id="editMemberModal">
+ <div class="modalbox">
+   <h3>✏️ 編輯成員資料</h3>
+   <input type="hidden" id="editMemberId">
+   <div class="field"><label>成員姓名</label><input id="editMemberNameInput"></div>
+   <div class="field">
+     <label>更新照片 (若不更新請留空)</label>
+     <input id="editMemberImgInput" type="file" accept="image/*">
+   </div>
+   <div class="modalactions">
+     <button onclick="closeEditMemberModal()">取消</button>
+     <button class="primary" onclick="submitEditMember()">儲存變更</button>
+   </div>
+ </div>
+</div>
+
+<!-- 每日任務與獎勵設定對話框 -->
+<div class="modal" id="taskModal">
+ <div class="modalbox">
+   <h3>⚙️ 每日任務設定</h3>
+   <div class="field">
+     <label>完成每日全部 3 個任務總獎勵 (<span class="curr-unit">NT$</span>)</label>
+     <div style="display:flex;gap:8px">
+       <input id="allTaskRewardInput" type="number" min="0" placeholder="例如：100" style="flex:1">
+       <button class="primary" onclick="saveTaskReward()">儲存獎勵</button>
+     </div>
+   </div>
+
+   <div class="field" style="margin-top:16px">
+     <label>重骰每日任務扣除金額 (<span class="curr-unit">NT$</span>)</label>
+     <div style="display:flex;gap:8px">
+       <input id="taskRerollCostInput" type="number" min="0" placeholder="例如：10" style="flex:1">
+       <button class="primary" onclick="saveTaskRerollCost()">儲存費用</button>
+     </div>
+   </div>
+
+   <hr style="border:0;border-top:1px solid var(--line);margin:16px 0">
+
+   <h4 style="margin:0 0 8px">任務庫管理 (最少需保留 3 個)</h4>
+   <div class="field"><label>新增任務內容</label><input id="taskTitle" placeholder="例如：看一本好書 / 運動 30 分鐘"></div>
+   <button class="primary" style="width:100%;margin-top:2px" onclick="addTask()">新增至任務庫</button>
+   
+   <h4 style="margin:16px 0 8px">現有任務清單：</h4>
+   <div id="taskManageList" class="task-manage-list"></div>
+   
+   <div class="modalactions" style="margin-top:20px"><button onclick="closeTaskModal()">關閉</button></div>
+ </div>
+</div>
+
+<!-- 簽到設定對話框 -->
+<div class="modal" id="checkinConfigModal">
+ <div class="modalbox">
+   <h3>📅 設定簽到獎勵</h3>
+   <div class="field"><label>每日簽到獎勵 (<span class="curr-unit">NT$</span>)</label><input id="dailyRewardInput" type="number" min="0"></div>
+   <div class="field"><label>滿 7 天加碼獎勵 (<span class="curr-unit">NT$</span>)</label><input id="weeklyRewardInput" type="number" min="0"></div>
+
+   <div class="modalactions">
+     <button onclick="closeCheckinConfigModal()">取消</button>
+     <button class="primary" onclick="saveCheckinConfig()">儲存</button>
+   </div>
+ </div>
+</div>
+
+<script>
+const KEY = "gacha-vault-v1";
+const DEFAULT_TASKS = [
+  { id: 1, title: "登入遊戲解每日" },
+  { id: 2, title: "看一本好書 / 運動 30 分鐘" },
+  { id: 3, title: "今日沒有衝動消費" },
+  { id: 4, title: "喝水 2000cc" },
+  { id: 5, title: "整理房間/桌面 10 分鐘" },
+  { id: 6, title: "背 10 個單字或學習新知識" }
+];
+const DEFAULT_CATEGORIES = [
+  { id: "uni", name: "UNI'S ON AIR" },
+  { id: "sakukore", name: "サクコレ" }
+];
+
+let data = { 
+  balance: 0, saved: 0, spent: 0, goals: [], logs: [], bgMap: {}, bgOpacity: 100, members: [],
+  oshiIds: [], oshiReward: 50,
+  dutyDate: "", dutyMemberIds: [], dutyRerollCost: 10,
+  categories: DEFAULT_CATEGORIES,
+  tasks: DEFAULT_TASKS,
+  allTaskReward: 100,
+  taskRerollCost: 10,
+  taskStatus: { date: "", activeIds: [], completed: [] },
+  checkin: { lastDate: "", history: [], dailyReward: 20, weeklyReward: 200 },
+  currency: "TWD",
+  jpyRate: 0.21
+};
+
+let historyStack = [];
+
+try {
+  const savedData = JSON.parse(localStorage.getItem(KEY));
+  if (savedData) {
+    data = Object.assign(data, savedData);
+    if (!data.categories || data.categories.length === 0) data.categories = DEFAULT_CATEGORIES;
+    if (!data.tasks || data.tasks.length === 0) data.tasks = DEFAULT_TASKS;
+    if (data.allTaskReward === undefined) data.allTaskReward = 100;
+    if (data.taskRerollCost === undefined) data.taskRerollCost = 10;
+    if (data.dutyRerollCost === undefined) data.dutyRerollCost = 10;
+    if (!data.taskStatus) data.taskStatus = { date: "", activeIds: [], completed: [] };
+    if (!data.checkin) data.checkin = { lastDate: "", history: [], dailyReward: 20, weeklyReward: 200 };
+    if (data.oshiReward === undefined) data.oshiReward = 50;
+    if (!data.oshiIds) {
+      if (savedData.oshiId) data.oshiIds = [savedData.oshiId];
+      else data.oshiIds = [];
+    }
+    if (!data.dutyMemberIds) data.dutyMemberIds = [];
+    if (!data.currency) data.currency = "TWD";
+    if (!data.jpyRate) data.jpyRate = 0.21;
+  }
+} catch (e) {
+  console.error("讀取本地資料失敗，重置為預設值", e);
+}
+
+function money(nInTWD) {
+  let val = Number(nInTWD || 0);
+  if (data.currency === "JPY") {
+    let jpy = Math.round(val / data.jpyRate);
+    return "￥ " + jpy.toLocaleString("ja-JP");
+  } else {
+    return "NT$ " + Math.round(val).toLocaleString("zh-TW");
+  }
+}
+
+function toTWD(amountInCurrentCurrency) {
+  let val = Number(amountInCurrentCurrency || 0);
+  if (data.currency === "JPY") {
+    return val * data.jpyRate;
+  }
+  return val;
+}
+
+function fromTWD(amountInTWD) {
+  let val = Number(amountInTWD || 0);
+  if (data.currency === "JPY") {
+    return Math.round(val / data.jpyRate);
+  }
+  return Math.round(val);
+}
+
+function updateCurrencyUnitUI() {
+  let unitText = data.currency === "JPY" ? "￥" : "NT$";
+  document.querySelectorAll(".curr-unit").forEach(el => el.textContent = unitText);
+  document.getElementById("currencySelect").value = data.currency;
+}
+
+function changeCurrency(curr) {
+  data.currency = curr;
+  updateCurrencyUnitUI();
+  save();
+}
+
+async function fetchBotRate() {
+  try {
+    const res = await fetch("https://api.allorigins.win/raw?url=https://rate.bot.com.tw/xrt/flcsv/0/day");
+    const text = await res.text();
+    const lines = text.split("\n");
+    for (let line of lines) {
+      if (line.includes("JPY")) {
+        const parts = line.split(",");
+        const rate = parseFloat(parts[12] || parts[13]);
+        if (!isNaN(rate) && rate > 0) {
+          data.jpyRate = rate;
+          updateRateDisplay();
+          save();
+          return;
+        }
+      }
+    }
+  } catch (e) {
+    console.warn("無法取得最新台銀匯率，使用備用匯率", e);
+  }
+  updateRateDisplay();
+}
+
+function updateRateDisplay() {
+  let rateEl = document.getElementById("rateDisplay");
+  if (rateEl) {
+    rateEl.textContent = `1 JPY ≈ ${data.jpyRate.toFixed(4)} TWD`;
+  }
+}
+
+function getTodayStr() { return new Date().toISOString().slice(0, 10); }
+
+function save() {
+  historyStack.push(JSON.stringify(data));
+  if (historyStack.length > 20) historyStack.shift();
+  updateUndoBtn();
+
+  localStorage.setItem(KEY, JSON.stringify(data));
+  updateDropdowns();
+  render();
+}
+
+function updateUndoBtn() {
+  let btn = document.getElementById("undoBtn");
+  if (btn) btn.disabled = historyStack.length <= 1;
+}
+
+function undo() {
+  if (historyStack.length <= 1) return;
+  historyStack.pop();
+  let previousState = historyStack[historyStack.length - 1];
+  data = JSON.parse(previousState);
+  localStorage.setItem(KEY, JSON.stringify(data));
+  
+  updateUndoBtn();
+  updateDropdowns();
+  updateCurrencyUnitUI();
+  updateRateDisplay();
+  render();
+  renderMemberList();
+  renderCatManageList();
+  renderTaskManageList();
+}
+
+function gameName(g) {
+  let cat = (data.categories || []).find(c => c.id === g);
+  return cat ? cat.name : "";
+}
+
+function selectedGame() { return document.getElementById("gameFilter")?.value || "all"; }
+
+function updateDropdowns() {
+  let filterSelect = document.getElementById("gameFilter");
+  let modalSelect = document.getElementById("game");
+  if (!filterSelect || !modalSelect) return;
+
+  let currentFilter = filterSelect.value;
+  let currentModal = modalSelect.value;
+
+  let filterOpts = `<option value="all">全部</option>` + 
+    data.categories.map(c => `<option value="${c.id}">${esc(c.name)}</option>`).join("");
+  
+  let modalOpts = data.categories.map(c => `<option value="${c.id}">${esc(c.name)}</option>`).join("");
+
+  filterSelect.innerHTML = filterOpts;
+  modalSelect.innerHTML = modalOpts;
+
+  if (currentFilter && filterSelect.querySelector(`option[value="${currentFilter}"]`)) {
+    filterSelect.value = currentFilter;
+  }
+  if (currentModal && modalSelect.querySelector(`option[value="${currentModal}"]`)) {
+    modalSelect.value = currentModal;
+  }
+}
+
+function updateBackground(filter) {
+  let opacity = (data.bgOpacity || 100) / 100;
+  let customBg = data.bgMap ? data.bgMap[filter] : null;
+  let slider = document.getElementById("bgOpacitySlider");
+  let valSpan = document.getElementById("bgOpacityVal");
+  if (slider) slider.value = data.bgOpacity || 100;
+  if (valSpan) valSpan.textContent = (data.bgOpacity || 100) + "%";
+
+  let maskAlpha = (1 - opacity) * 0.85;
+
+  if (customBg) {
+    document.body.style.backgroundImage = `linear-gradient(rgba(10,13,24,${maskAlpha}), rgba(10,13,24,${maskAlpha})), url('${customBg}')`;
+    document.body.className = '';
+  } else {
+    document.body.style.backgroundImage = '';
+    document.body.className = `bg-${filter}`;
+    document.body.style.filter = `brightness(${0.4 + opacity * 0.6})`;
+  }
+}
+
+function changeBgOpacity(val) { data.bgOpacity = Number(val); save(); }
+function triggerBgUpload() { document.getElementById("bgInput").click(); }
+function handleBgUpload(e) {
+  let file = e.target.files[0];
+  if (!file) return;
+  let reader = new FileReader();
+  reader.onload = event => {
+    let filter = selectedGame();
+    if (!data.bgMap) data.bgMap = {};
+    data.bgMap[filter] = event.target.result;
+    save();
+  };
+  reader.readAsDataURL(file);
+}
+function clearCurrentBg() {
+  let filter = selectedGame();
+  if (data.bgMap) delete data.bgMap[filter];
+  save();
+}
+
+function getMonthlyStats(filter) {
+  let now = new Date();
+  let currentYearMonth = `${now.getFullYear()}/${now.getMonth() + 1}`;
+  let mSaved = 0, mSpent = 0;
+
+  if (Array.isArray(data.logs)) {
+    data.logs.forEach(l => {
+      if (filter !== "all" && l.game && l.game !== filter) return;
+      let logDate = new Date(l.date);
+      let logYearMonth = `${logDate.getFullYear()}/${logDate.getMonth() + 1}`;
+      
+      if (logYearMonth === currentYearMonth) {
+        if (l.amount > 0) mSaved += l.amount;
+        else mSpent += Math.abs(l.amount);
+      }
+    });
+  }
+  return { saved: mSaved, spent: mSpent, net: mSaved - mSpent };
+}
+
+function checkAndAutoUpdateDuty() {
+  let today = getTodayStr();
+  if (data.dutyDate !== today || !data.dutyMemberIds || data.dutyMemberIds.length === 0) {
+    if (data.members && data.members.length > 0) {
+      data.dutyDate = today;
+      data.dutyMemberIds = pickRandomMemberIds(3);
+    }
+  }
+}
+
+function getDutyMembers() {
+  if (!data.members || data.members.length === 0) return [];
+  checkAndAutoUpdateDuty();
+
+  let membersMap = new Map(data.members.map(m => [m.id, m]));
+  let currentDuty = data.dutyMemberIds.map(id => membersMap.get(id)).filter(Boolean);
+
+  if (currentDuty.length < Math.min(3, data.members.length)) {
+    data.dutyDate = getTodayStr();
+    data.dutyMemberIds = pickRandomMemberIds(3);
+    currentDuty = data.dutyMemberIds.map(id => membersMap.get(id)).filter(Boolean);
+  }
+
+  return currentDuty;
+}
+
+function pickRandomMemberIds(count) {
+  if (!data.members || data.members.length === 0) return [];
+  let shuffled = [...data.members].sort(() => Math.random() - 0.5);
+  return shuffled.slice(0, Math.min(count, shuffled.length)).map(m => m.id);
+}
+
+function rerollDutyMembers() {
+  if (!data.members || data.members.length === 0) {
+    return alert("請先新增成員！");
+  }
+
+  let cost = Number(data.dutyRerollCost ?? 10);
+  if (data.balance < cost) {
+    return alert(`金庫額度不足 ${money(cost)}，無法進行重骰！`);
+  }
+
+  if (cost > 0) {
+    data.balance -= cost;
+    data.spent += cost;
+    if (!data.logs) data.logs = [];
+    data.logs.push({
+      amount: -cost,
+      note: "🎲 重骰值班成員",
+      date: new Date().toLocaleString("zh-TW")
+    });
+  }
+
+  data.dutyDate = getTodayStr();
+  data.dutyMemberIds = pickRandomMemberIds(3);
+
+  let membersMap = new Map(data.members.map(m => [m.id, m]));
+  let currentDuty = data.dutyMemberIds.map(id => membersMap.get(id)).filter(Boolean);
+  let oshiSet = new Set(data.oshiIds || []);
+
+  let hitOshiList = currentDuty.filter(m => oshiSet.has(m.id));
+  if (hitOshiList.length > 0) {
+    let rewardPerOshi = Number(data.oshiReward ?? 50);
+    let totalOshiReward = rewardPerOshi * hitOshiList.length;
+
+    if (totalOshiReward > 0) {
+      data.balance += totalOshiReward;
+      data.saved += totalOshiReward;
+      let namesStr = hitOshiList.map(m => m.name).join("、");
+      data.logs.push({
+        amount: totalOshiReward,
+        note: `👑 重骰幸運抽中推し【${namesStr}】(共 ${hitOshiList.length} 位)！`,
+        date: new Date().toLocaleString("zh-TW")
+      });
+    }
+  }
+
+  save();
+}
+
+function renderDutyMembers() {
+  let members = getDutyMembers();
+  let container = document.getElementById("dutyMemberArea");
+  let costDesc = document.getElementById("dutyCostDesc");
+  if (costDesc) {
+    let cost = Number(data.dutyRerollCost ?? 10);
+    costDesc.textContent = `每次重骰扣除 ${money(cost)}，每日 0:00 自動更新成員`;
+  }
+  if (!container) return;
+  
+  if (members.length > 0) {
+    let oshiSet = new Set(data.oshiIds || []);
+    let cardsHtml = members.map(m => {
+      let isOshi = oshiSet.has(m.id);
+      return `
+        <div class="duty-card ${isOshi ? 'is-oshi' : ''}">
+          <img src="${m.img}" alt="${esc(m.name)}">
+          <div class="member-tag">${isOshi ? '👑 ' : ''}${esc(m.name)}</div>
+        </div>
+      `;
+    }).join("");
+    container.innerHTML = `<div class="duty-grid">${cardsHtml}</div>`;
+  } else {
+    container.innerHTML = `<div class="empty">尚無成員照片，點擊右上角「管理成員」上傳吧！</div>`;
+  }
+}
+
+function getDailyActiveTasks() {
+  let today = getTodayStr();
+  let pool = data.tasks || [];
+  
+  let needsNew = data.taskStatus.date !== today || !data.taskStatus.activeIds || data.taskStatus.activeIds.some(id => !pool.some(t => t.id === id));
+  
+  if (needsNew) {
+    let copyPool = [...pool];
+    let seed = Number(today.replace(/-/g, ''));
+    for (let i = copyPool.length - 1; i > 0; i--) {
+      let j = (seed * (i + 1)) % (i + 1);
+      [copyPool[i], copyPool[j]] = [copyPool[j], copyPool[i]];
+    }
+    let pickCount = Math.min(3, copyPool.length);
+    let activeIds = copyPool.slice(0, pickCount).map(t => t.id);
+    
+    data.taskStatus = { date: today, activeIds: activeIds, completed: [] };
+  }
+  return data.taskStatus.activeIds;
+}
+
+function rerollDailyTasks() {
+  let tasks = data.tasks || [];
+  if (tasks.length === 0) {
+    return alert("任務庫尚無任務，請先至任務設定新增！");
+  }
+
+  let activeIds = getDailyActiveTasks();
+  let completedList = data.taskStatus.completed || [];
+  
+  if (activeIds.length > 0 && completedList.length >= activeIds.length) {
+    return alert("今日任務已全部完成，無法再進行重骰！");
+  }
+
+  if (completedList.length > 0) {
+    let cost = Number(data.taskRerollCost ?? 10);
+    if (!confirm(`目前任務已有進度，重骰將會使「已完成進度全部重來」並扣除 ${money(cost)}，確定要重骰嗎？`)) {
+      return;
+    }
+  }
+
+  let cost = Number(data.taskRerollCost ?? 10);
+  if (data.balance < cost) {
+    return alert(`金庫額度不足 ${money(cost)}，無法進行重骰！`);
+  }
+
+  if (cost > 0) {
+    data.balance -= cost;
+    data.spent += cost;
+    if (!data.logs) data.logs = [];
+    data.logs.push({
+      amount: -cost,
+      note: "🎲 重骰每日任務",
+      date: new Date().toLocaleString("zh-TW")
+    });
+  }
+
+  let copyPool = [...tasks].sort(() => Math.random() - 0.5);
+  let pickCount = Math.min(3, copyPool.length);
+  let newActiveIds = copyPool.slice(0, pickCount).map(t => t.id);
+
+  data.taskStatus = {
+    date: getTodayStr(),
+    activeIds: newActiveIds,
+    completed: []
+  };
+
+  save();
+}
+
+function completeTask(taskId) {
+  getDailyActiveTasks();
+  if (data.taskStatus.completed.includes(taskId)) return;
+
+  data.taskStatus.completed.push(taskId);
+
+  let activeIds = data.taskStatus.activeIds;
+  let allDone = activeIds.length >= 3 && activeIds.every(id => data.taskStatus.completed.includes(id));
+
+  if (allDone) {
+    let totalReward = Number(data.allTaskReward ?? 100);
+
+    if (totalReward > 0) {
+      data.balance += totalReward;
+      data.saved += totalReward;
+
+      if (!data.logs) data.logs = [];
+      data.logs.push({
+        amount: totalReward,
+        note: `🎉 今日每日 3 項任務全部完成！`,
+        date: new Date().toLocaleString("zh-TW")
+      });
+    }
+  }
+
+  save();
+}
+
+function renderTasks() {
+  let activeIds = getDailyActiveTasks();
+  let container = document.getElementById("taskList");
+  let rerollBtn = document.getElementById("rerollTaskBtn");
+  let costDesc = document.getElementById("taskCostDesc");
+  if (costDesc) {
+    let cost = Number(data.taskRerollCost ?? 10);
+    costDesc.textContent = `每次重骰扣除 ${money(cost)}，每日 0:00 自動更新任務`;
+  }
+  if (!container) return;
+
+  let tasks = data.tasks || [];
+  let activeTasks = activeIds.map(id => tasks.find(t => t.id === id)).filter(Boolean);
+  let completedList = data.taskStatus.completed || [];
+
+  document.getElementById("allTaskRewardText").textContent = money(data.allTaskReward ?? 100);
+  document.getElementById("taskProgressText").textContent = `${completedList.length} / ${activeTasks.length}`;
+  let percent = activeTasks.length ? (completedList.length / activeTasks.length) * 100 : 0;
+  document.getElementById("taskProgressBar").style.width = percent + "%";
+
+  if (rerollBtn) {
+    let isAllDone = activeTasks.length > 0 && completedList.length >= activeTasks.length;
+    rerollBtn.disabled = isAllDone;
+    rerollBtn.title = isAllDone ? "今日任務已全部完成，無法重骰" : "重骰任務";
+  }
+
+  if (activeTasks.length === 0) {
+    container.innerHTML = `<div class="empty">任務庫少於 3 個任務，請先至任務設定新增</div>`;
+    return;
+  }
+
+  container.innerHTML = activeTasks.map(t => {
+    let isDone = completedList.includes(t.id);
+    return `
+      <div class="task-item ${isDone ? 'done' : ''}">
+        <div class="task-title" title="${esc(t.title)}">${esc(t.title)}</div>
+        <button class="task-btn ${isDone ? 'completed' : ''}" ${isDone ? 'disabled' : ''} onclick="completeTask(${t.id})">
+          ${isDone ? '✓ 已完成' : '完成'}
+        </button>
+      </div>
+    `;
+  }).join("");
+}
+
+function renderCheckin() {
+  let grid = document.getElementById("checkinGrid");
+  let btn = document.getElementById("checkinBtn");
+  if (!grid || !btn) return;
+
+  let today = getTodayStr();
+  let isCheckedToday = data.checkin.lastDate === today;
+
+  btn.disabled = isCheckedToday;
+  btn.textContent = isCheckedToday ? "今日已簽到 ✓" : "每日簽到";
+
+  let history = data.checkin.history || [];
+  let days = ["一", "二", "三", "四", "五", "六", "日"];
+  
+  grid.innerHTML = days.map((dayName, idx) => {
+    let isDone = history.length > idx;
+    let isToday = history.length === idx && !isCheckedToday;
+    return `
+      <div class="checkin-day ${isDone ? 'done' : ''} ${isToday ? 'today' : ''}">
+        <div>週${dayName}</div>
+        <div style="font-weight:bold;margin-top:2px">${isDone ? '✓' : idx + 1}</div>
+      </div>
+    `;
+  }).join("");
+}
+
+function doCheckin() {
+  let today = getTodayStr();
+  if (data.checkin.lastDate === today) return;
+
+  if (!data.checkin.history) data.checkin.history = [];
+
+  if (data.checkin.history.length >= 7) {
+    data.checkin.history = [];
+  }
+
+  data.checkin.history.push(today);
+  data.checkin.lastDate = today;
+
+  let dailyReward = Number(data.checkin.dailyReward ?? 20);
+  let weeklyReward = Number(data.checkin.weeklyReward ?? 200);
+
+  let totalReward = dailyReward;
+  let noteStr = `每日簽到獎勵`;
+
+  if (data.checkin.history.length === 7) {
+    totalReward += weeklyReward;
+    noteStr = `連續 7 天簽到大禮包！`;
+  }
+
+  if (totalReward > 0) {
+    data.balance += totalReward;
+    data.saved += totalReward;
+
+    if (!data.logs) data.logs = [];
+    data.logs.push({
+      amount: totalReward,
+      note: noteStr,
+      date: new Date().toLocaleString("zh-TW")
+    });
+  }
+
+  save();
+}
+
+function clearCheckinData() {
+  if (confirm("確定要清除目前的簽到資料嗎？")) {
+    data.checkin.lastDate = "";
+    data.checkin.history = [];
+    save();
+  }
+}
+
+function render() {
+  let filter = selectedGame();
+  updateBackground(filter);
+  updateCurrencyUnitUI();
+
+  const balanceEl = document.getElementById("balance");
+  if (balanceEl) balanceEl.textContent = money(data.balance);
+  
+  let mStats = getMonthlyStats(filter);
+  const mSavedEl = document.getElementById("monthSaved");
+  const mSpentEl = document.getElementById("monthSpent");
+  const netEl = document.getElementById("monthNet");
+
+  if (mSavedEl) mSavedEl.textContent = money(mStats.saved);
+  if (mSpentEl) mSpentEl.textContent = money(mStats.spent);
+  if (netEl) {
+    netEl.textContent = (mStats.net >= 0 ? "+" : "") + money(mStats.net);
+    netEl.className = mStats.net >= 0 ? "plus" : "minus";
+  }
+
+  renderDutyMembers();
+  renderTasks();
+  renderCheckin();
+
+  let goalsContainer = document.getElementById("goals");
+  if (goalsContainer) {
+    let visibleGoals = (data.goals || []).map((g, i) => ({ ...g, _i: i })).filter(g => filter === "all" || g.game === filter);
+    goalsContainer.innerHTML = visibleGoals.length ? visibleGoals.map((g) => {
+      let p = Math.min(100, (g.current / g.target) * 100);
+      let imgHtml = g.img ? `<img src="${g.img}" class="thumb">` : '';
+      let catNameStr = gameName(g.game);
+      return `<div class="goal"><div style="display:flex;gap:12px;align-items:center;flex:1">${imgHtml}<div><div class="goal-name">${catNameStr ? catNameStr + " · " : ""}${esc(g.name)}</div><div class="muted">${money(g.current)} / ${money(g.target)}</div><div class="bar goal-bar" style="height:6px;background:#2d3754;border-radius:99px;margin-top:4px"><div class="fill" style="width:${p}%;height:100%;background:linear-gradient(90deg,#7d6cff,#c29cff);border-radius:99px"></div></div></div></div><div><button class="primary" onclick="openFundModal(${g._i})">目標</button><button class="btn-del" onclick="deleteGoal(${g._i})">✕</button></div></div>`;
+    }).join("") : '<div class="empty">還沒有課金目標，建立一個來規劃花費吧。</div>';
+  }
+
+  let logContainer = document.getElementById("log");
+  if (logContainer) {
+    let visibleLogs = (data.logs || []).map((l, i) => ({ ...l, _i: i })).filter(l => filter === "all" || !l.game || l.game === filter);
+    logContainer.innerHTML = visibleLogs.length ? visibleLogs.slice().reverse().map(l => {
+      let imgHtml = l.img ? `<img src="${l.img}" class="thumb">` : '';
+      let catNameStr = gameName(l.game);
+      return `<div class="logrow"><div style="display:flex;gap:12px;align-items:center">${imgHtml}<div><b>${catNameStr ? catNameStr + " · " : ""}${esc(l.note || l.type)}</b><div class="muted">${l.date}</div></div></div><div style="display:flex;align-items:center;gap:8px"><b class="${l.amount > 0 ? 'plus' : 'minus'}">${l.amount > 0 ? '+' : ''}${money(l.amount)}</b><button class="btn-del" onclick="deleteLog(${l._i})">✕</button></div></div>`;
+    }).join("") : '<div class="empty">還沒有紀錄。</div>';
+  }
+}
+
+function openCatModal() {
+  document.getElementById("catModal").classList.add("open");
+  renderCatManageList();
+}
+function closeCatModal() { document.getElementById("catModal").classList.remove("open"); }
+function addCategory() {
+  let name = document.getElementById("catName").value.trim();
+  if (!name) return alert("請輸入分類名稱！");
+  let id = "cat_" + Date.now();
+  data.categories.push({ id, name });
+  document.getElementById("catName").value = "";
+  save();
+  renderCatManageList();
+}
+function deleteCategory(id) {
+  if (data.categories.length <= 1) return alert("至少需要保留一個分類！");
+  if (confirm("確定刪除此分類嗎？（已發生的歷史紀錄不會被清除）")) {
+    data.categories = data.categories.filter(c => c.id !== id);
+    save();
+    renderCatManageList();
+  }
+}
+function renderCatManageList() {
+  let container = document.getElementById("catManageList");
+  if (!container) return;
+  container.innerHTML = data.categories.map(c => `
+    <div class="cat-manage-item">
+      <b>${esc(c.name)}</b>
+      <button class="btn-del" onclick="deleteCategory('${c.id}')">✕ 刪除</button>
+    </div>
+  `).join("");
+}
+
+function openTaskModal() {
+  document.getElementById("taskModal").classList.add("open");
+  document.getElementById("allTaskRewardInput").value = fromTWD(data.allTaskReward ?? 100);
+  document.getElementById("taskRerollCostInput").value = fromTWD(data.taskRerollCost ?? 10);
+  renderTaskManageList();
+}
+function closeTaskModal() { document.getElementById("taskModal").classList.remove("open"); }
+
+function saveTaskReward() {
+  let valStr = document.getElementById("allTaskRewardInput").value;
+  if (valStr === "") return alert("請輸入獎勵金額！");
+  let val = Number(valStr);
+  if (isNaN(val) || val < 0) return alert("請輸入有效的獎勵金額（不可為負數）！");
+  data.allTaskReward = toTWD(val);
+  save();
+  renderTasks();
+  alert("獎勵設定已儲存！");
+}
+
+function saveTaskRerollCost() {
+  let valStr = document.getElementById("taskRerollCostInput").value;
+  if (valStr === "") return alert("請輸入扣除金額！");
+  let val = Number(valStr);
+  if (isNaN(val) || val < 0) return alert("請輸入有效的金額（不可為負數）！");
+  data.taskRerollCost = toTWD(val);
+  save();
+  renderTasks();
+  alert("任務重骰費用已儲存！");
+}
+
+function addTask() {
+  let title = document.getElementById("taskTitle").value.trim();
+  if (!title) return alert("請輸入任務內容！");
+
+  data.tasks.push({ id: Date.now(), title });
+  document.getElementById("taskTitle").value = "";
+
+  save();
+  renderTaskManageList();
+  renderTasks();
+}
+function deleteTask(id) {
+  if ((data.tasks || []).length <= 3) {
+    return alert("任務庫最少必須保留 3 個任務,以便每天抽取！");
+  }
+  data.tasks = data.tasks.filter(t => t.id !== id);
+  save();
+  renderTaskManageList();
+  renderTasks();
+}
+function renderTaskManageList() {
+  let container = document.getElementById("taskManageList");
+  if (!container) return;
+  if (!data.tasks || data.tasks.length === 0) {
+    container.innerHTML = '<div class="empty" style="padding:8px 0">任務庫尚無任務</div>';
+    return;
+  }
+  container.innerHTML = data.tasks.map(t => `
+    <div class="task-manage-item">
+      <b>${esc(t.title)}</b>
+      <button class="btn-del" onclick="deleteTask(${t.id})">✕ 刪除</button>
+    </div>
+  `).join("");
+}
+
+function openCheckinConfigModal() {
+  document.getElementById("checkinConfigModal").classList.add("open");
+  document.getElementById("dailyRewardInput").value = fromTWD(data.checkin.dailyReward ?? 20);
+  document.getElementById("weeklyRewardInput").value = fromTWD(data.checkin.weeklyReward ?? 200);
+}
+function closeCheckinConfigModal() { document.getElementById("checkinConfigModal").classList.remove("open"); }
+function saveCheckinConfig() {
+  let dailyStr = document.getElementById("dailyRewardInput").value;
+  let weeklyStr = document.getElementById("weeklyRewardInput").value;
+  
+  let daily = Number(dailyStr);
+  let weekly = Number(weeklyStr);
+  
+  data.checkin.dailyReward = (!isNaN(daily) && daily >= 0) ? toTWD(daily) : 0;
+  data.checkin.weeklyReward = (!isNaN(weekly) && weekly >= 0) ? toTWD(weekly) : 0;
+  
+  closeCheckinConfigModal();
+  save();
+}
+
+function openMemberModal() { 
+  document.getElementById("memberModal").classList.add("open"); 
+  document.getElementById("oshiRewardInput").value = fromTWD(data.oshiReward ?? 50);
+  document.getElementById("dutyRerollCostInput").value = fromTWD(data.dutyRerollCost ?? 10);
+  renderMemberList(); 
+}
+function closeMemberModal() { document.getElementById("memberModal").classList.remove("open"); }
+function addMember() {
+  let name = document.getElementById("memberNameInput").value.trim();
+  let fileInput = document.getElementById("memberImgInput");
+  let file = fileInput.files[0];
+
+  if (!name) return alert("請輸入成員姓名！");
+  if (!file) return alert("請選取成員照片！");
+
+  let reader = new FileReader();
+  reader.onload = ev => {
+    if (!data.members) data.members = [];
+    let id = Date.now();
+    data.members.push({ id, name, img: ev.target.result });
+    document.getElementById("memberNameInput").value = "";
+    document.getElementById("memberImgInput").value = "";
+    save(); renderMemberList();
+  };
+  reader.readAsDataURL(file);
+}
+
+function openEditMemberModal(id) {
+  let m = data.members.find(item => item.id === id);
+  if (!m) return;
+  document.getElementById("editMemberId").value = m.id;
+  document.getElementById("editMemberNameInput").value = m.name;
+  document.getElementById("editMemberImgInput").value = "";
+  document.getElementById("editMemberModal").classList.add("open");
+}
+
+function closeEditMemberModal() {
+  document.getElementById("editMemberModal").classList.remove("open");
+}
+
+function submitEditMember() {
+  let id = Number(document.getElementById("editMemberId").value);
+  let name = document.getElementById("editMemberNameInput").value.trim();
+  let fileInput = document.getElementById("editMemberImgInput");
+  let file = fileInput.files[0];
+
+  if (!name) return alert("請輸入成員姓名！");
+
+  let memberIndex = data.members.findIndex(m => m.id === id);
+  if (memberIndex === -1) return;
+
+  function updateData(newImgBase64) {
+    data.members[memberIndex].name = name;
+    if (newImgBase64) {
+      data.members[memberIndex].img = newImgBase64;
+    }
+    save();
+    renderMemberList();
+    closeEditMemberModal();
+  }
+
+  if (file) {
+    let reader = new FileReader();
+    reader.onload = ev => updateData(ev.target.result);
+    reader.readAsDataURL(file);
+  } else {
+    updateData(null);
+  }
+}
+
+function toggleOshi(id) {
+  if (!data.oshiIds) data.oshiIds = [];
+  let index = data.oshiIds.indexOf(id);
+  if (index > -1) {
+    data.oshiIds.splice(index, 1);
+  } else {
+    data.oshiIds.push(id);
+  }
+  save();
+  renderMemberList();
+}
+
+function saveOshiReward(val) {
+  let num = Number(val);
+  data.oshiReward = (!isNaN(num) && num >= 0) ? toTWD(num) : 0;
+  save();
+}
+
+function saveDutyRerollCost(val) {
+  let num = Number(val);
+  data.dutyRerollCost = (!isNaN(num) && num >= 0) ? toTWD(num) : 0;
+  save();
+}
+
+function deleteMember(id) { 
+  data.members = data.members.filter(m => m.id !== id);
+  if (data.oshiIds) {
+    data.oshiIds = data.oshiIds.filter(oshiId => oshiId !== id);
+  }
+  save(); renderMemberList(); 
+}
+
+function renderMemberList() {
+  let container = document.getElementById("memberList");
+  if (!container) return;
+  if (!data.members || data.members.length === 0) { 
+    container.innerHTML = '<div class="empty" style="padding:8px 0">尚未新增成員</div>'; 
+    return; 
+  }
+  let oshiSet = new Set(data.oshiIds || []);
+  container.innerHTML = data.members.map(m => {
+    let isOshi = oshiSet.has(m.id);
+    return `
+      <div class="member-item">
+        <div style="display:flex;align-items:center;gap:10px">
+          <img src="${m.img}" style="width:36px;height:48px;border-radius:6px;object-fit:cover;border:1px solid var(--line)">
+          <div>
+            <b>${esc(m.name)}</b>
+            ${isOshi ? '<div style="font-size:11px;color:var(--gold);font-weight:bold">👑 推し中</div>' : ''}
+          </div>
+        </div>
+        <div style="display:flex;gap:4px;align-items:center">
+          <button onclick="toggleOshi(${m.id})" style="padding:4px 8px;font-size:12px;background:${isOshi ? '#3a202a' : '#151a2b'};color:${isOshi ? '#ff9ab0' : 'white'}">
+            ${isOshi ? '✓ 取消推し' : '👑 設為推し'}
+          </button>
+          <button class="btn-edit" onclick="openEditMemberModal(${m.id})">✏️ 編輯</button>
+          <button class="btn-del" onclick="deleteMember(${m.id})">✕ 刪除</button>
+        </div>
+      </div>
+    `;
+  }).join("");
+}
+
+function esc(s) { return String(s || '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;' }[c])); }
+
+function openModal(m) {
+  mode = m;
+  document.getElementById("modal").classList.add("open");
+  document.getElementById("amount").value = "";
+  document.getElementById("note").value = "";
+  document.getElementById("imageInput").value = "";
+  document.getElementById("modalTitle").textContent = m === "add" ? "📥 儲值金庫" : m === "spend" ? "💸 記錄活動課金" : "🎯 新增課金目標";
+  document.getElementById("amountLabel").innerHTML = `金額 (<span class="curr-unit">${data.currency === "JPY" ? "￥" : "NT$"}</span>)`;
+  
+  let gameField = document.getElementById("gameField");
+  if (gameField) {
+    gameField.style.display = (m === "add") ? "none" : "block";
+  }
+
+  let noteLabel = document.getElementById("noteLabel");
+  if (noteLabel) {
+    noteLabel.textContent = m === "goal" ? "目標名稱" : "備註";
+  }
+
+  document.getElementById("note").placeholder = m === "goal" ? "例如：周年限定卡池" : (m === "add" ? "例如：月度儲值" : "例如：購買月卡 / 禮包");
+}
+function closeModal() { document.getElementById("modal").classList.remove("open"); }
+
+function openFundModal(i) {
+  let g = data.goals[i];
+  document.getElementById("fundGoalIndex").value = i;
+  document.getElementById("fundModalTitle").textContent = `🎯 達成目標：${g.name}`;
+  document.getElementById("fundAmount").value = "";
+  document.getElementById("fundNote").value = "";
+  document.getElementById("fundImageInput").value = "";
+  document.getElementById("fundModal").classList.add("open");
+}
+
+function closeFundModal() {
+  document.getElementById("fundModal").classList.remove("open");
+}
+
+function submitFundGoal() {
+  let i = Number(document.getElementById("fundGoalIndex").value);
+  let amountStr = document.getElementById("fundAmount").value;
+  let amountInput = Number(amountStr);
+  let note = document.getElementById("fundNote").value.trim();
+  let fileInput = document.getElementById("fundImageInput");
+  let file = fileInput.files[0];
+
+  if (amountStr === "" || isNaN(amountInput) || amountInput <= 0) {
+    return alert("請輸入有效的扣款金額！");
+  }
+
+  let amountTWD = toTWD(amountInput);
+  if (amountTWD > data.balance) {
+    return alert("金庫額度不足！");
+  }
+
+  let g = data.goals[i];
+  if (!g) return;
+
+  function processFund(imgBase64) {
+    data.balance -= amountTWD;
+    data.spent += amountTWD;
+    g.current += amountTWD;
+
+    let finalImg = imgBase64 || g.img;
+
+    if (!data.logs) data.logs = [];
+    data.logs.push({
+      amount: -amountTWD,
+      note: `達成目標【${g.name}】: ${note || '課金花費'}`,
+      game: g.game,
+      date: new Date().toLocaleString("zh-TW"),
+      img: finalImg
+    });
+
+    closeFundModal();
+    save();
+  }
+
+  if (file) {
+    let reader = new FileReader();
+    reader.onload = e => processFund(e.target.result);
+    reader.readAsDataURL(file);
+  } else {
+    processFund(null);
+  }
+}
+
+function submitModal() {
+  let amountStr = document.getElementById("amount").value;
+  let amountInput = Number(amountStr);
+  let note = document.getElementById("note").value.trim();
+  if (amountStr === "" || isNaN(amountInput) || amountInput < 0) return alert("請輸入有效金額");
+  
+  let amountTWD = toTWD(amountInput);
+  let fileInput = document.getElementById("imageInput");
+  let file = fileInput.files[0];
+
+  function processData(imgBase64) {
+    if (mode === "goal") {
+      if (!data.goals) data.goals = [];
+      data.goals.push({ name: note || "未命名目標", target: amountTWD, current: 0, game: document.getElementById("game").value, img: imgBase64 });
+      closeModal(); save(); return;
+    }
+    if (mode === "spend" && amountTWD > data.balance) return alert("金庫額度不足！");
+    
+    data.balance += mode === "add" ? amountTWD : -amountTWD;
+    if (mode === "add") {
+      data.saved += amountTWD;
+    } else {
+      data.spent += amountTWD;
+    }
+    
+    if (!data.logs) data.logs = [];
+    data.logs.push({
+      amount: mode === "add" ? amountTWD : -amountTWD,
+      note: note || (mode === "add" ? "儲值" : "課金"),
+      game: mode === "add" ? null : document.getElementById("game").value,
+      date: new Date().toLocaleString("zh-TW"),
+      img: imgBase64
+    });
+    
+    closeModal(); save();
+  }
+
+  if (file) {
+    let reader = new FileReader();
+    reader.onload = e => processData(e.target.result);
+    reader.readAsDataURL(file);
+  } else {
+    processData(null);
+  }
+}
+
+function deleteGoal(i) {
+  if (confirm("確定刪除此課金目標嗎？")) {
+    data.goals.splice(i, 1);
+    save();
+  }
+}
+
+function deleteLog(i) {
+  if (confirm("確定要刪除這筆紀錄嗎？（不會影響當前金庫餘額）")) {
+    data.logs.splice(i, 1);
+    save();
+  }
+}
+
+function clearAllLogs() {
+  let filter = selectedGame();
+  let msg = filter === "all" ? "確定要刪除所有紀錄嗎？" : "確定要刪除目前篩選分類的所有紀錄嗎？";
+  if (confirm(msg)) {
+    if (filter === "all") {
+      data.logs = [];
+    } else {
+      data.logs = data.logs.filter(l => l.game && l.game !== filter);
+    }
+    save();
+  }
+}
+
+function resetBalanceToZero() {
+  if (confirm("確定要將目前的可用課金額度歸零嗎？")) {
+    data.balance = 0;
+    if (!data.logs) data.logs = [];
+    data.logs.push({
+      amount: 0,
+      note: "🔄 金庫額度歸零",
+      date: new Date().toLocaleString("zh-TW")
+    });
+    save();
+  }
+}
+
+function resetAll() {
+  if (confirm("確定要清除所有資料嗎？")) {
+    localStorage.removeItem(KEY);
+    location.reload();
+  }
+}
+
+document.addEventListener("DOMContentLoaded", () => {
+  historyStack.push(JSON.stringify(data));
+  updateUndoBtn();
+  updateDropdowns();
+  updateCurrencyUnitUI();
+  fetchBotRate();
+  render();
+});
+</script>
+</body>
+</html>
