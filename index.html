@@ -389,21 +389,32 @@ body.force-desktop .checkin-task-compact h2 { font-size: 1.12rem !important; mar
             <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">
               <h2 style="margin:0">📅 簽到</h2>
               <div style="display:flex;gap:4px">
-                <button onclick="clearCheckinData()" title="清除簽到" style="padding:3px 6px;font-size:0.68rem;background:#4a2032;color:#ffb1c5">🗑️</button>
+                <button onclick="resetMonthlyCheckin()" title="重製簽到" style="padding:3px 6px;font-size:0.68rem;background:#4a3220;color:#ffd36a">🔄 重製</button>
+                <button onclick="clearCheckinData()" title="清除今日簽到" style="padding:3px 6px;font-size:0.68rem;background:#4a2032;color:#ffb1c5">🗑️</button>
                 <button onclick="openCheckinConfigModal()" style="padding:3px 6px;font-size:0.68rem">設定</button>
               </div>
             </div>
 
-            <!-- 進度條簽到 UI -->
+            <!-- 進度條簽到 UI (包含連續簽到與一個月簽到進度條) -->
             <div style="margin-bottom:8px">
               <div style="display:flex;justify-content:space-between;font-size:0.68rem;color:var(--muted);margin-bottom:3px">
                 <span>連續簽到進度</span>
                 <span id="checkinProgressText">0 / 7 天</span>
               </div>
-              <div style="height:7px;background:#2d3754;border-radius:99px;overflow:hidden">
+              <div style="height:7px;background:#2d3754;border-radius:99px;overflow:hidden;margin-bottom:6px">
                 <div id="checkinProgressBar" style="width:0%;height:100%;background:linear-gradient(90deg,#52d6a0,#ffd36a);transition:width 0.3s"></div>
               </div>
-              <div style="font-size:0.62rem;color:var(--gold);margin-top:3px;text-align:right" id="checkinRewardTip">滿 7 天加碼週獎勵：NT$ 200</div>
+              <div style="font-size:0.62rem;color:var(--gold);margin-bottom:8px;text-align:right" id="checkinRewardTip">滿 7 天加碼週獎勵：NT$ 200</div>
+
+              <!-- 新增一個月簽到的進度條 -->
+              <div style="display:flex;justify-content:space-between;font-size:0.68rem;color:var(--muted);margin-bottom:3px">
+                <span>本月簽到總進度</span>
+                <span id="monthCheckinProgressText">0 / 30 天</span>
+              </div>
+              <div style="height:7px;background:#2d3754;border-radius:99px;overflow:hidden;margin-bottom:4px">
+                <div id="monthCheckinProgressBar" style="width:0%;height:100%;background:linear-gradient(90deg,#7565ff,#a56dff);transition:width 0.3s"></div>
+              </div>
+              <div style="font-size:0.62rem;color:#a56dff;margin-bottom:8px;text-align:right" id="monthCheckinRewardTip">滿 30 天月獎勵：NT$ 1000</div>
             </div>
           </div>
 
@@ -581,6 +592,7 @@ body.force-desktop .checkin-task-compact h2 { font-size: 1.12rem !important; mar
    <h3>📅 設定簽到獎勵</h3>
    <div class="field"><label>每日簽到獎勵 (<span class="curr-unit">NT$</span>)</label><input id="dailyRewardInput" type="number" min="0"></div>
    <div class="field"><label>滿 7 天加碼週獎勵 (<span class="curr-unit">NT$</span>)</label><input id="weeklyRewardInput" type="number" min="0"></div>
+   <div class="field"><label>滿 30 天月簽到獎勵 (<span class="curr-unit">NT$</span>)</label><input id="monthlyRewardInput" type="number" min="0"></div>
 
    <div class="modalactions">
      <button onclick="closeCheckinConfigModal()">取消</button>
@@ -613,7 +625,7 @@ let data = {
   allTaskReward: 100,
   taskRerollCost: 10,
   taskStatus: { date: "", activeIds: [], completed: [] },
-  checkin: { lastDate: "", count: 0, lastRetroDate: "", dailyReward: 20, weeklyReward: 200 },
+  checkin: { lastDate: "", count: 0, lastRetroDate: "", dailyReward: 20, weeklyReward: 200, monthlyReward: 1000, monthCount: 0, monthRecordDate: "" },
   currency: "TWD",
   jpyRate: 0.21
 };
@@ -635,8 +647,10 @@ try {
     if (data.taskRerollCost === undefined) data.taskRerollCost = 10;
     if (data.dutyRerollCost === undefined) data.dutyRerollCost = 10;
     if (!data.taskStatus) data.taskStatus = { date: "", activeIds: [], completed: [] };
-    if (!data.checkin) data.checkin = { lastDate: "", count: 0, lastRetroDate: "", dailyReward: 20, weeklyReward: 200 };
+    if (!data.checkin) data.checkin = { lastDate: "", count: 0, lastRetroDate: "", dailyReward: 20, weeklyReward: 200, monthlyReward: 1000, monthCount: 0, monthRecordDate: "" };
     if (data.checkin.count === undefined) data.checkin.count = 0;
+    if (data.checkin.monthCount === undefined) data.checkin.monthCount = 0;
+    if (data.checkin.monthlyReward === undefined) data.checkin.monthlyReward = 1000;
     if (data.oshiReward === undefined) data.oshiReward = 50;
     if (!data.oshiIds) {
       if (savedData.oshiId) data.oshiIds = [savedData.oshiId];
@@ -1158,13 +1172,25 @@ function renderCheckin() {
   let retroBtn = document.getElementById("retroCheckinBtn");
   let progressText = document.getElementById("checkinProgressText");
   let progressBar = document.getElementById("checkinProgressBar");
+  let monthProgressText = document.getElementById("monthCheckinProgressText");
+  let monthProgressBar = document.getElementById("monthCheckinProgressBar");
   let rewardTip = document.getElementById("checkinRewardTip");
+  let monthRewardTip = document.getElementById("monthCheckinRewardTip");
   
   if (!btn || !progressText || !progressBar) return;
 
   let today = getCustomDayStr();
+  let currentYearMonth = today.slice(0, 7); // "YYYY-MM"
+
+  // 跨月份自動歸零一個月簽到進度
+  if (data.checkin.monthRecordDate !== currentYearMonth) {
+    data.checkin.monthCount = 0;
+    data.checkin.monthRecordDate = currentYearMonth;
+  }
+
   let isCheckedToday = data.checkin.lastDate === today;
   let count = data.checkin.count || 0;
+  let monthCount = data.checkin.monthCount || 0;
 
   btn.disabled = isCheckedToday;
   btn.textContent = isCheckedToday ? "今日已簽到 ✓" : "每日簽到";
@@ -1174,19 +1200,39 @@ function renderCheckin() {
     retroBtn.style.display = canRetro ? "block" : "none";
   }
 
+  // 7天連續簽到進度條
   progressText.textContent = `${count} / 7 天`;
   let percent = Math.min(100, (count / 7) * 100);
   progressBar.style.width = percent + "%";
+
+  // 一個月簽到總進度條（以 30 天為滿分基準）
+  let maxMonthDays = 30;
+  monthProgressText.textContent = `${monthCount} / ${maxMonthDays} 天`;
+  let monthPercent = Math.min(100, (monthCount / maxMonthDays) * 100);
+  if (monthProgressBar) monthProgressBar.style.width = monthPercent + "%";
 
   let weeklyRev = money(data.checkin.weeklyReward ?? 200);
   if (rewardTip) {
     rewardTip.textContent = `滿 7 天加碼週獎勵：${weeklyRev}`;
   }
+
+  let monthlyRev = money(data.checkin.monthlyReward ?? 1000);
+  if (monthRewardTip) {
+    monthRewardTip.textContent = `滿 30 天月獎勵：${monthlyRev}`;
+  }
 }
 
 function processCheckinReward(isRetro = false) {
   let today = getCustomDayStr();
+  let currentYearMonth = today.slice(0, 7);
+
+  if (data.checkin.monthRecordDate !== currentYearMonth) {
+    data.checkin.monthCount = 0;
+    data.checkin.monthRecordDate = currentYearMonth;
+  }
+
   data.checkin.count = (data.checkin.count || 0) + 1;
+  data.checkin.monthCount = (data.checkin.monthCount || 0) + 1;
   
   if (isRetro) {
     data.checkin.lastRetroDate = today;
@@ -1196,6 +1242,7 @@ function processCheckinReward(isRetro = false) {
 
   let dailyReward = Number(data.checkin.dailyReward ?? 20);
   let weeklyReward = Number(data.checkin.weeklyReward ?? 200);
+  let monthlyReward = Number(data.checkin.monthlyReward ?? 1000);
 
   let totalReward = dailyReward;
   let noteStr = isRetro ? `補簽到獎勵` : `每日簽到獎勵`;
@@ -1204,6 +1251,12 @@ function processCheckinReward(isRetro = false) {
     totalReward += weeklyReward;
     noteStr = isRetro ? `補簽到達成滿 7 天大禮包！` : `連續 7 天簽到加碼週獎勵！`;
     data.checkin.count = 0;
+  }
+
+  // 檢查是否達成滿 30 天月簽到獎勵
+  if (data.checkin.monthCount === 30) {
+    totalReward += monthlyReward;
+    noteStr += ` ＆ 本月簽到滿 30 天月獎勵！`;
   }
 
   if (totalReward > 0) {
@@ -1238,10 +1291,18 @@ function doRetroCheckin() {
 }
 
 function clearCheckinData() {
-  if (confirm("確定要重置目前的簽到進度嗎？")) {
+  if (confirm("確定要清除今天的簽到狀態嗎？")) {
+    data.checkin.lastDate = "";
+    save();
+  }
+}
+
+function resetMonthlyCheckin() {
+  if (confirm("確定要重製簽到進度嗎？這將會把連續簽到天數與本月簽到天數歸零。")) {
     data.checkin.lastDate = "";
     data.checkin.count = 0;
     data.checkin.lastRetroDate = "";
+    data.checkin.monthCount = 0;
     save();
   }
 }
@@ -1394,17 +1455,21 @@ function openCheckinConfigModal() {
   document.getElementById("checkinConfigModal").classList.add("open");
   document.getElementById("dailyRewardInput").value = fromTWD(data.checkin.dailyReward ?? 20);
   document.getElementById("weeklyRewardInput").value = fromTWD(data.checkin.weeklyReward ?? 200);
+  document.getElementById("monthlyRewardInput").value = fromTWD(data.checkin.monthlyReward ?? 1000);
 }
 function closeCheckinConfigModal() { document.getElementById("checkinConfigModal").classList.remove("open"); }
 function saveCheckinConfig() {
   let dailyStr = document.getElementById("dailyRewardInput").value;
   let weeklyStr = document.getElementById("weeklyRewardInput").value;
+  let monthlyStr = document.getElementById("monthlyRewardInput").value;
   
   let daily = Number(dailyStr);
   let weekly = Number(weeklyStr);
+  let monthly = Number(monthlyStr);
   
   data.checkin.dailyReward = (!isNaN(daily) && daily >= 0) ? toTWD(daily) : 0;
   data.checkin.weeklyReward = (!isNaN(weekly) && weekly >= 0) ? toTWD(weekly) : 0;
+  data.checkin.monthlyReward = (!isNaN(monthly) && monthly >= 0) ? toTWD(monthly) : 0;
   
   closeCheckinConfigModal();
   save();
