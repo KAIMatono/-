@@ -20,7 +20,16 @@
   --good: #52d6a0;
   --bad: #ff6f91;
   --gold: #ffd36a;
+  
+  /* 字體大小縮放變數 */
+  --font-scale: 1;
 }
+
+/* 套用字體大小全域變數 */
+html {
+  font-size: calc(16px * var(--font-scale));
+}
+
 * { box-sizing: border-box; }
 body {
   margin: 0;
@@ -39,31 +48,31 @@ body.bg-sakukore { background: linear-gradient(135deg, rgba(60, 25, 45, 0.7), rg
 
 .app { max-width: 1100px; margin: auto; padding: 28px 18px 50px; }
 .top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; }
-.brand { font-size: 25px; font-weight: 800; }
+.brand { font-size: 1.56rem; font-weight: 800; }
 .brand span { color: var(--accent); }
-button { border: 0; border-radius: 12px; padding: 11px 16px; color: white; background: var(--card2); cursor: pointer; font-weight: 700; }
+button { border: 0; border-radius: 12px; padding: 11px 16px; color: white; background: var(--card2); cursor: pointer; font-weight: 700; font-size: 0.9rem; }
 button:hover { filter: brightness(1.15); }
 button:disabled { opacity: 0.5; cursor: not-allowed; filter: none; }
 
 .grid { display: grid; grid-template-columns: 1.35fr .65fr; gap: 18px; }
 .card { background: linear-gradient(145deg, rgba(31, 38, 62, 0.88), rgba(25, 31, 50, 0.88)); backdrop-filter: blur(12px); border: 1px solid var(--line); border-radius: 20px; padding: 22px; box-shadow: 0 12px 35px #0004; }
-.balance { font-size: 52px; font-weight: 900; margin: 10px 0 15px; }
-.muted { color: var(--muted); }
+.balance { font-size: 3.25rem; font-weight: 900; margin: 10px 0 15px; }
+.muted { color: var(--muted); font-size: 0.9rem; }
 .hero { position: relative; overflow: hidden; }
-.hero:after { content: "💎"; position: absolute; right: 35px; top: 25px; font-size: 90px; opacity: .15; }
+.hero:after { content: "💎"; position: absolute; right: 35px; top: 25px; font-size: 5.6rem; opacity: .15; }
 .actions { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 10px; }
 .primary { background: linear-gradient(135deg, #7565ff, #a56dff); }
 .danger { background: #4a2032; color: #ffb1c5; }
 .stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-top: 12px; }
 .stat { background: #151a2b; border: 1px solid var(--line); border-radius: 14px; padding: 14px; }
-.stat b { display: block; font-size: 18px; margin-top: 4px; }
+.stat b { display: block; font-size: 1.12rem; margin-top: 4px; }
 .section { margin-top: 18px; }
-.section h2 { font-size: 18px; margin: 0 0 13px; }
+.section h2 { font-size: 1.12rem; margin: 0 0 13px; }
 .goal { display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 13px 0; border-bottom: 1px solid var(--line); }
 .goal:last-child { border: 0; }
 .goal-name { font-weight: 800; }
 .goal-bar { width: 150px; }
-.goal button { padding: 7px 10px; font-size: 12px; margin-left: 4px; }
+.goal button { padding: 7px 10px; font-size: 0.75rem; margin-left: 4px; }
 .log { max-height: 330px; overflow: auto; }
 .logrow { display: flex; justify-content: space-between; align-items: center; gap: 12px; padding: 12px 0; border-bottom: 1px solid var(--line); }
 .plus { color: var(--good); }
@@ -76,18 +85,18 @@ button:disabled { opacity: 0.5; cursor: not-allowed; filter: none; }
 .modalbox { width: min(460px, 100%); background: #1b2238; border: 1px solid var(--line); border-radius: 20px; padding: 22px; max-height: 90vh; overflow-y: auto; }
 .modalbox h3 { margin-top: 0; }
 .field { margin: 13px 0; }
-.field label { display: block; color: var(--muted); font-size: 13px; margin-bottom: 6px; }
-.field input, .field select { width: 100%; padding: 12px; border-radius: 10px; border: 1px solid var(--line); background: #121624; color: white; font-size: 16px; }
+.field label { display: block; color: var(--muted); font-size: 0.81rem; margin-bottom: 6px; }
+.field input, .field select { width: 100%; padding: 12px; border-radius: 10px; border: 1px solid var(--line); background: #121624; color: white; font-size: 1rem; }
 .modalactions { display: flex; gap: 9px; justify-content: flex-end; margin-top: 18px; }
-.btn-del { background: none; border: none; color: var(--muted); cursor: pointer; padding: 2px 6px; font-size: 12px; }
+.btn-del { background: none; border: none; color: var(--muted); cursor: pointer; padding: 2px 6px; font-size: 0.75rem; }
 .btn-del:hover { color: var(--bad); }
-.btn-edit { background: none; border: none; color: var(--accent); cursor: pointer; padding: 2px 6px; font-size: 12px; }
+.btn-edit { background: none; border: none; color: var(--accent); cursor: pointer; padding: 2px 6px; font-size: 0.75rem; }
 .btn-edit:hover { filter: brightness(1.2); }
 .thumb { width: 48px; height: 48px; border-radius: 8px; object-fit: cover; border: 1px solid var(--line); }
 .bg-btn-group { display: flex; gap: 6px; margin-top: 8px; }
-.bg-btn-group button { padding: 6px 10px; font-size: 12px; background: #151a2b; border: 1px solid var(--line); }
+.bg-btn-group button { padding: 6px 10px; font-size: 0.75rem; background: #151a2b; border: 1px solid var(--line); }
 .slider-container { margin-top: 12px; }
-.slider-container label { font-size: 12px; color: var(--muted); display: flex; justify-content: space-between; }
+.slider-container label { font-size: 0.75rem; color: var(--muted); display: flex; justify-content: space-between; }
 .slider-container input { width: 100%; margin-top: 4px; }
 
 /* 今日值班成員三聯卡樣式 */
@@ -96,9 +105,8 @@ button:disabled { opacity: 0.5; cursor: not-allowed; filter: none; }
 .duty-card:hover { transform: translateY(-2px); border-color: var(--accent); }
 .duty-card.is-oshi { border-color: var(--gold); box-shadow: 0 0 12px rgba(255, 211, 106, 0.4); }
 .duty-card img { width: 100%; height: 100%; object-fit: cover; display: block; }
-.duty-card .member-tag { position: absolute; bottom: 0; inset-x: 0; background: linear-gradient(transparent, rgba(0,0,0,0.8)); color: white; font-size: 11px; font-weight: bold; text-align: center; padding: 12px 2px 4px; }
+.duty-card .member-tag { position: absolute; bottom: 0; inset-x: 0; background: linear-gradient(transparent, rgba(0,0,0,0.8)); color: white; font-size: 0.68rem; font-weight: bold; text-align: center; padding: 12px 2px 4px; }
 
-/* 電腦版針對今日值班成員微調比例，讓高度更對齊左側 */
 body.force-desktop .duty-card { aspect-ratio: 3/4.6; }
 @media(min-width: 781px) {
   body:not(.force-mobile) .duty-card { aspect-ratio: 3/4.6; }
@@ -123,7 +131,7 @@ body.force-desktop .duty-card { aspect-ratio: 3/4.6; }
 }
 .task-item.done { opacity: 0.55; }
 .task-title {
-  font-size: 12px;
+  font-size: 0.75rem;
   font-weight: 600;
   white-space: nowrap;
   overflow: hidden;
@@ -132,7 +140,7 @@ body.force-desktop .duty-card { aspect-ratio: 3/4.6; }
 }
 .task-btn { 
   padding: 4px 8px; 
-  font-size: 11px; 
+  font-size: 0.68rem; 
   background: var(--accent); 
   border-radius: 6px;
   white-space: nowrap;
@@ -140,37 +148,29 @@ body.force-desktop .duty-card { aspect-ratio: 3/4.6; }
 }
 .task-btn.completed { background: #2f3b5c; color: var(--good); }
 
-/* 每日簽到樣式 */
-.checkin-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 4px; margin-top: 8px; }
-.checkin-day { background: #121624; border: 1px solid var(--line); border-radius: 8px; padding: 6px 2px; text-align: center; font-size: 11px; }
-.checkin-day.done { border-color: var(--good); color: var(--good); background: rgba(82,214,160,0.1); }
-.checkin-day.today { border-color: var(--accent); font-weight: bold; }
-
 /* 手動切換排版模式樣式 */
 body.force-mobile .app { max-width: 480px !important; padding: 16px 10px 40px !important; }
 body.force-mobile .grid { grid-template-columns: 1fr !important; }
 body.force-mobile .stats { grid-template-columns: 1fr 1fr !important; }
 
-/* 手機版：將額度與本月統計併排為同一列，並縮小額度區塊尺寸 */
 body.force-mobile .hero-stats-row { display: grid; grid-template-columns: 1fr 1.1fr; gap: 8px; align-items: stretch; margin-bottom: 14px; }
 body.force-mobile .hero-compact { padding: 12px 14px !important; display: flex; flex-direction: column; justify-content: space-between; }
-body.force-mobile .hero-compact .balance { font-size: 26px !important; margin: 4px 0 8px !important; }
-body.force-mobile .hero-compact .muted { font-size: 11px; }
+body.force-mobile .hero-compact .balance { font-size: 1.62rem !important; margin: 4px 0 8px !important; }
+body.force-mobile .hero-compact .muted { font-size: 0.68rem; }
 body.force-mobile .hero-compact .actions { gap: 6px; margin-top: 0; }
-body.force-mobile .hero-compact button { padding: 6px 8px; font-size: 12px; border-radius: 8px; }
+body.force-mobile .hero-compact button { padding: 6px 8px; font-size: 0.75rem; border-radius: 8px; }
 body.force-mobile .hero-compact:after { display: none; }
 
 body.force-mobile .stats-compact { padding: 12px 12px !important; display: flex; flex-direction: column; justify-content: space-between; }
-body.force-mobile .stats-compact h2 { font-size: 14px !important; margin: 0 0 6px !important; }
+body.force-mobile .stats-compact h2 { font-size: 0.87rem !important; margin: 0 0 6px !important; }
 body.force-mobile .stats-grid-compact { display: grid; grid-template-columns: 1fr; gap: 4px; }
 body.force-mobile .stats-compact .stat { padding: 6px 10px; border-radius: 8px; display: flex; justify-content: space-between; align-items: center; }
-body.force-mobile .stats-compact .stat span { font-size: 11px; }
-body.force-mobile .stats-compact .stat b { font-size: 13px; margin-top: 0; }
+body.force-mobile .stats-compact .stat span { font-size: 0.68rem; }
+body.force-mobile .stats-compact .stat b { font-size: 0.81rem; margin-top: 0; }
 
-/* 手機版：將「課金目標」與「最近紀錄」併排為同一列，並縮短長度一半 */
 body.force-mobile .goal-log-row { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; align-items: stretch; }
 body.force-mobile .goal-log-compact { padding: 12px !important; margin-top: 0 !important; display: flex; flex-direction: column; justify-content: space-between; }
-body.force-mobile .goal-log-compact h2 { font-size: 14px !important; margin: 0 0 8px !important; }
+body.force-mobile .goal-log-compact h2 { font-size: 0.87rem !important; margin: 0 0 8px !important; }
 body.force-mobile .goal-log-compact .goal-scroll-area,
 body.force-mobile .goal-log-compact .log-scroll-area { max-height: 160px; overflow-y: auto; }
 body.force-mobile .goal-log-compact .goal,
@@ -178,31 +178,30 @@ body.force-mobile .goal-log-compact .logrow { padding: 8px 0 !important; }
 body.force-mobile .goal-log-compact .goal-bar { width: 60px !important; }
 body.force-mobile .goal-log-compact .thumb { width: 32px; height: 32px; }
 
-/* 簽到與任務並排（手機版專用容器） */
 .checkin-task-row { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; align-items: stretch; }
 .checkin-task-compact { padding: 14px !important; margin-top: 0 !important; display: flex; flex-direction: column; justify-content: space-between; }
-.checkin-task-compact h2 { font-size: 15px !important; margin: 0 0 8px !important; }
+.checkin-task-compact h2 { font-size: 0.93rem !important; margin: 0 0 8px !important; }
 
 body.force-desktop .app { max-width: 1100px !important; }
 body.force-desktop .grid { display: grid !important; grid-template-columns: 1.35fr .65fr !important; }
 body.force-desktop .hero-stats-row { display: block !important; }
 body.force-desktop .hero-compact { padding: 22px !important; display: block !important; }
-body.force-desktop .hero-compact .balance { font-size: 52px !important; margin: 10px 0 15px !important; }
-body.force-desktop .hero-compact .muted { font-size: 14px !important; }
+body.force-desktop .hero-compact .balance { font-size: 3.25rem !important; margin: 10px 0 15px !important; }
+body.force-desktop .hero-compact .muted { font-size: 0.9rem !important; }
 body.force-desktop .hero-compact .actions { gap: 10px !important; margin-top: 10px !important; }
-body.force-desktop .hero-compact button { padding: 11px 16px !important; font-size: 14px !important; border-radius: 12px !important; }
+body.force-desktop .hero-compact button { padding: 11px 16px !important; font-size: 0.9rem !important; border-radius: 12px !important; }
 body.force-desktop .hero-compact:after { display: block !important; }
 
 body.force-desktop .stats-compact { padding: 22px !important; display: block !important; margin-top: 18px !important; }
-body.force-desktop .stats-compact h2 { font-size: 18px !important; margin: 0 0 13px !important; }
+body.force-desktop .stats-compact h2 { font-size: 1.12rem !important; margin: 0 0 13px !important; }
 body.force-desktop .stats-grid-compact { display: grid !important; grid-template-columns: repeat(3, 1fr) !important; gap: 10px !important; }
 body.force-desktop .stats-compact .stat { padding: 14px !important; border-radius: 14px !important; display: block !important; }
-body.force-desktop .stats-compact .stat span { font-size: 14px !important; }
-body.force-desktop .stats-compact .stat b { font-size: 18px !important; margin-top: 4px !important; }
+body.force-desktop .stats-compact .stat span { font-size: 0.9rem !important; }
+body.force-desktop .stats-compact .stat b { font-size: 1.12rem !important; margin-top: 4px !important; }
 
 body.force-desktop .goal-log-row { display: block !important; }
 body.force-desktop .goal-log-compact { padding: 22px !important; margin-top: 18px !important; display: block !important; }
-body.force-desktop .goal-log-compact h2 { font-size: 18px !important; margin: 0 0 13px !important; }
+body.force-desktop .goal-log-compact h2 { font-size: 1.12rem !important; margin: 0 0 13px !important; }
 body.force-desktop .goal-log-compact .goal-scroll-area,
 body.force-desktop .goal-log-compact .log-scroll-area { max-height: 330px !important; overflow-y: auto !important; }
 body.force-desktop .goal-log-compact .goal,
@@ -212,49 +211,113 @@ body.force-desktop .goal-log-compact .thumb { width: 48px !important; height: 48
 
 body.force-desktop .checkin-task-row { display: block !important; }
 body.force-desktop .checkin-task-compact { padding: 22px !important; margin-top: 18px !important; display: block !important; }
-body.force-desktop .checkin-task-compact h2 { font-size: 18px !important; margin: 0 0 13px !important; }
+body.force-desktop .checkin-task-compact h2 { font-size: 1.12rem !important; margin: 0 0 13px !important; }
 
+/* 針對手機版或小螢幕的標題區塊控制，維持兩行不掉到第三行 */
 @media(max-width: 780px) {
   .grid { grid-template-columns: 1fr; }
   .stats { grid-template-columns: 1fr 1fr; }
   .top { align-items: flex-start; flex-wrap: wrap; gap: 10px; }
-  .balance { font-size: 42px; }
-  .goal-bar { width: 100px; }
+  .balance { font-size: 2.62rem; }
+  .goal-bar { width: 80px; }
   .checkin-task-row { grid-template-columns: 1fr 1fr; }
+
+  /* 針對手機版標題列按鈕微調字體與間距以確保剛好兩行 */
+  .top button, .top select {
+    padding: 6px 8px !important;
+    font-size: 0.75rem !important;
+    border-radius: 10px !important;
+  }
+  .brand {
+    font-size: 1.12rem !important;
+  }
+
+  /* 課金目標項目手機版優化：字體縮小、強制單行顯示 */
+  .goal {
+    font-size: 0.75rem;
+    padding: 8px 0 !important;
+  }
+  .goal-name {
+    font-size: 0.75rem;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 110px;
+  }
+  .goal .muted {
+    font-size: 0.68rem;
+    white-space: nowrap;
+  }
+  .goal button {
+    padding: 4px 6px !important;
+    font-size: 0.68rem !important;
+    margin-left: 2px !important;
+  }
+
+  /* 最近紀錄項目手機版優化：字體縮小、強制單行顯示 */
+  .logrow {
+    font-size: 0.68rem;
+    padding: 8px 0 !important;
+  }
+  .logrow b {
+    font-size: 0.68rem;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 120px;
+    display: inline-block;
+  }
+  .logrow .muted {
+    font-size: 0.62rem;
+    white-space: nowrap;
+  }
+  .logrow .plus, .logrow .minus {
+    font-size: 0.68rem;
+    white-space: nowrap;
+  }
+  .logrow .thumb {
+    width: 32px !important;
+    height: 32px !important;
+  }
 }
 </style>
 </head>
 <body class="bg-all">
 <div class="app">
   <!-- 標題區塊 -->
-  <div class="top" style="flex-direction: column; align-items: stretch; gap: 10px;">
+  <div class="top" style="flex-direction: column; align-items: stretch; gap: 8px;">
     <!-- 第一行：課金金庫、切換為電腦版、幣值、遊戲類別 -->
-    <div style="display: flex; justify-content: space-between; align-items: center; width: 100%; flex-wrap: wrap; gap: 6px;">
-      <div class="brand" style="font-size: 20px;">🎮 課金<span>金庫</span></div>
-      <div style="display: flex; gap: 6px; align-items: center; flex-wrap: wrap;">
-        <button id="viewToggleBtn" onclick="toggleViewMode()" style="background:#3a3278;color:#ffd36a;padding:8px 10px;font-size:13px;">💻 切換為電腦版</button>
-        <select id="currencySelect" onchange="changeCurrency(this.value)" style="padding:8px 8px;border-radius:12px;border:1px solid var(--line);background:var(--card2);color:white;font-weight:700;font-size:13px;">
+    <div style="display: flex; justify-content: space-between; align-items: center; width: 100%; flex-wrap: nowrap; gap: 6px;">
+      <div class="brand" style="font-size: 1.25rem; white-space: nowrap;">🎮 課金<span>金庫</span></div>
+      <div style="display: flex; gap: 4px; align-items: center; flex-wrap: nowrap;">
+        <button id="viewToggleBtn" onclick="toggleViewMode()" style="background:#3a3278;color:#ffd36a;padding:8px 10px;font-size:0.81rem;white-space:nowrap;">💻 電腦版</button>
+        <select id="currencySelect" onchange="changeCurrency(this.value)" style="padding:8px 6px;border-radius:12px;border:1px solid var(--line);background:var(--card2);color:white;font-weight:700;font-size:0.81rem;">
           <option value="TWD">NT$</option>
           <option value="JPY">￥</option>
         </select>
-        <select id="gameFilter" onchange="render()" style="padding:8px 8px;border-radius:12px;border:1px solid var(--line);background:var(--card2);color:white;font-weight:700;font-size:13px;">
+        <select id="gameFilter" onchange="render()" style="padding:8px 6px;border-radius:12px;border:1px solid var(--line);background:var(--card2);color:white;font-weight:700;font-size:0.81rem;max-width:110px;">
         </select>
       </div>
     </div>
 
-    <!-- 第二行：上一步、設定、餘額歸零、重置資料 -->
-    <div style="display: flex; gap: 6px; align-items: center; justify-content: flex-end; width: 100%; flex-wrap: wrap;">
-      <button id="undoBtn" onclick="undo()" disabled style="padding:8px 12px;font-size:13px;">↩️ 上一步</button>
-      <button onclick="openCatModal()" style="padding:8px 12px;font-size:13px;">⚙️ 設定</button>
-      <button onclick="resetBalanceToZero()" style="background:#4a3220;color:#ffd36a;padding:8px 12px;font-size: 13px;">餘額歸零</button>
-      <button onclick="resetAll()" style="padding:8px 12px;font-size: 13px;">重置資料</button>
+    <!-- 第二行：字體大小切換按鈕組、上一步、設定、歸零、重置 -->
+    <div style="display: flex; gap: 4px; align-items: center; justify-content: flex-end; width: 100%; flex-wrap: nowrap; overflow-x: auto;">
+      <div style="display: inline-flex; background: var(--card2); border-radius: 12px; padding: 2px; border: 1px solid var(--line); flex-shrink: 0;">
+        <button id="fontShrinkBtn" onclick="setFontScale(0)" style="background: transparent; border-radius: 10px; padding: 6px 8px; font-size: 0.78rem;" title="字體縮小">小</button>
+        <button id="fontDefaultBtn" onclick="setFontScale(1)" style="background: transparent; border-radius: 10px; padding: 6px 8px; font-size: 0.78rem;" title="預設字體">中</button>
+        <button id="fontEnlargeBtn" onclick="setFontScale(2)" style="background: transparent; border-radius: 10px; padding: 6px 8px; font-size: 0.78rem;" title="字體放大">大</button>
+      </div>
+      <button id="undoBtn" onclick="undo()" disabled style="padding:8px 10px;font-size:0.81rem;white-space:nowrap;flex-shrink:0;">↩️ 上一步</button>
+      <button onclick="openCatModal()" style="padding:8px 10px;font-size:0.81rem;white-space:nowrap;flex-shrink:0;">⚙️ 設定</button>
+      <button onclick="resetBalanceToZero()" style="background:#4a3220;color:#ffd36a;padding:8px 10px;font-size:0.81rem;white-space:nowrap;flex-shrink:0;">歸零</button>
+      <button onclick="resetAll()" style="padding:8px 10px;font-size:0.81rem;white-space:nowrap;flex-shrink:0;">重置</button>
     </div>
   </div>
 
   <!-- 匯率提示資訊條 -->
-  <div style="font-size:12px;color:var(--muted);margin-bottom:12px;display:flex;justify-content:space-between;align-items:center;background:#151a2b;padding:6px 12px;border-radius:8px;border:1px solid var(--line)">
+  <div style="font-size:0.75rem;color:var(--muted);margin-bottom:12px;display:flex;justify-content:space-between;align-items:center;background:#151a2b;padding:6px 12px;border-radius:8px;border:1px solid var(--line)">
     <span>🏦 台灣銀行日幣現鈔賣出匯率：<b id="rateDisplay" style="color:var(--gold)">1 JPY ≈ 0.21 TWD</b></span>
-    <button onclick="fetchBotRate()" style="padding:2px 8px;font-size:11px;background:none;border:1px solid var(--line);color:var(--muted)">🔄 更新匯率</button>
+    <button onclick="fetchBotRate()" style="padding:2px 8px;font-size:0.68rem;background:none;border:1px solid var(--line);color:var(--muted)">🔄 更新匯率</button>
   </div>
 
   <div class="grid">
@@ -286,7 +349,7 @@ body.force-desktop .checkin-task-compact h2 { font-size: 18px !important; margin
           <div>
             <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
               <h2 style="margin:0">🎯 課金目標</h2>
-              <button style="padding:3px 6px;font-size:11px" onclick="openModal('goal')">＋ 新增</button>
+              <button style="padding:3px 6px;font-size:0.68rem" onclick="openModal('goal')">＋ 新增</button>
             </div>
             <div id="goals" class="goal-scroll-area"></div>
           </div>
@@ -296,7 +359,7 @@ body.force-desktop .checkin-task-compact h2 { font-size: 18px !important; margin
           <div>
             <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
               <h2 style="margin:0">📜 最近紀錄</h2>
-              <button onclick="clearAllLogs()" style="padding:3px 6px;font-size:11px;background:#4a2032;color:#ffb1c5">清空</button>
+              <button onclick="clearAllLogs()" style="padding:3px 6px;font-size:0.68rem;background:#4a2032;color:#ffb1c5">清空</button>
             </div>
             <div class="log log-scroll-area" id="log"></div>
           </div>
@@ -309,11 +372,11 @@ body.force-desktop .checkin-task-compact h2 { font-size: 18px !important; margin
         <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
           <h2 style="margin:0">🌟 今日值班成員</h2>
           <div style="display:flex;gap:4px">
-            <button onclick="rerollDutyMembers()" style="padding:4px 8px;font-size:13px;background:var(--accent)">🎲</button>
-            <button onclick="openMemberModal()" style="padding:4px 8px;font-size:12px">管理成員</button>
+            <button onclick="rerollDutyMembers()" style="padding:4px 8px;font-size:0.81rem;background:var(--accent)">🎲</button>
+            <button onclick="openMemberModal()" style="padding:4px 8px;font-size:0.75rem">管理成員</button>
           </div>
         </div>
-        <div style="font-size:11px;color:var(--muted);margin-bottom:8px" id="dutyCostDesc">每次重骰扣除 10 元，每日 0:00 自動更新成員</div>
+        <div style="font-size:0.68rem;color:var(--muted);margin-bottom:8px" id="dutyCostDesc">每次重骰扣除 10 元，每日 3:00 自動更新成員</div>
         <div id="dutyMemberArea">
           <div class="empty">尚無成員照片，點擊右上角「管理成員」上傳吧！</div>
         </div>
@@ -323,16 +386,31 @@ body.force-desktop .checkin-task-compact h2 { font-size: 18px !important; margin
       <div class="checkin-task-row section">
         <section class="card checkin-task-compact">
           <div>
-            <div style="display:flex;justify-content:space-between;align-items:center">
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">
               <h2 style="margin:0">📅 簽到</h2>
               <div style="display:flex;gap:4px">
-                <button onclick="clearCheckinData()" title="清除簽到" style="padding:3px 6px;font-size:11px;background:#4a2032;color:#ffb1c5">🗑️</button>
-                <button onclick="openCheckinConfigModal()" style="padding:3px 6px;font-size:11px">設定</button>
+                <button onclick="clearCheckinData()" title="清除簽到" style="padding:3px 6px;font-size:0.68rem;background:#4a2032;color:#ffb1c5">🗑️</button>
+                <button onclick="openCheckinConfigModal()" style="padding:3px 6px;font-size:0.68rem">設定</button>
               </div>
             </div>
-            <div class="checkin-grid" id="checkinGrid"></div>
+
+            <!-- 進度條簽到 UI -->
+            <div style="margin-bottom:8px">
+              <div style="display:flex;justify-content:space-between;font-size:0.68rem;color:var(--muted);margin-bottom:3px">
+                <span>連續簽到進度</span>
+                <span id="checkinProgressText">0 / 7 天</span>
+              </div>
+              <div style="height:7px;background:#2d3754;border-radius:99px;overflow:hidden">
+                <div id="checkinProgressBar" style="width:0%;height:100%;background:linear-gradient(90deg,#52d6a0,#ffd36a);transition:width 0.3s"></div>
+              </div>
+              <div style="font-size:0.62rem;color:var(--gold);margin-top:3px;text-align:right" id="checkinRewardTip">滿 7 天加碼週獎勵：NT$ 200</div>
+            </div>
           </div>
-          <button id="checkinBtn" class="primary" style="width:100%;margin-top:10px;padding:8px;font-size:12px" onclick="doCheckin()">每日簽到</button>
+
+          <div style="display:flex;gap:6px">
+            <button id="checkinBtn" class="primary" style="flex:1;padding:7px;font-size:0.75rem" onclick="doCheckin()">每日簽到</button>
+            <button id="retroCheckinBtn" onclick="doRetroCheckin()" title="補簽到（一天一次）" style="padding:7px 10px;font-size:0.75rem;background:#293250;border:1px solid var(--line);display:none">➕ 補簽</button>
+          </div>
         </section>
 
         <section class="card checkin-task-compact">
@@ -340,13 +418,13 @@ body.force-desktop .checkin-task-compact h2 { font-size: 18px !important; margin
             <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">
               <div style="display:flex;align-items:center;gap:4px">
                 <h2 style="margin:0">📋 任務</h2>
-                <button id="rerollTaskBtn" onclick="rerollDailyTasks()" style="padding:3px 6px;font-size:11px;background:var(--accent)">🎲</button>
+                <button id="rerollTaskBtn" onclick="rerollDailyTasks()" style="padding:3px 6px;font-size:0.68rem;background:var(--accent)">🎲</button>
               </div>
-              <button onclick="openTaskModal()" style="padding:3px 6px;font-size:11px">⚙️</button>
+              <button onclick="openTaskModal()" style="padding:3px 6px;font-size:0.68rem">⚙️</button>
             </div>
             
             <div style="margin-bottom:8px">
-              <div style="display:flex;justify-content:space-between;font-size:11px;color:var(--muted);margin-bottom:2px">
+              <div style="display:flex;justify-content:space-between;font-size:0.68rem;color:var(--muted);margin-bottom:2px">
                 <span>獎勵: <b id="allTaskRewardText" style="color:var(--gold)">NT$ 100</b></span>
                 <span id="taskProgressText">0 / 3</span>
               </div>
@@ -404,7 +482,7 @@ body.force-desktop .checkin-task-compact h2 { font-size: 18px !important; margin
    <hr style="border:0;border-top:1px solid var(--line);margin:20px 0">
 
    <h4>🖼️ 桌布與畫面調光</h4>
-   <div class="muted" style="font-size:12px;margin-bottom:8px">為目前的分類自訂獨立的背景壁紙：</div>
+   <div class="muted" style="font-size:0.75rem;margin-bottom:8px">為目前的分類自訂獨立的背景壁紙：</div>
 
    <div class="slider-container">
      <label><span>背景亮度</span><span id="bgOpacityVal">100%</span></label>
@@ -502,7 +580,7 @@ body.force-desktop .checkin-task-compact h2 { font-size: 18px !important; margin
  <div class="modalbox">
    <h3>📅 設定簽到獎勵</h3>
    <div class="field"><label>每日簽到獎勵 (<span class="curr-unit">NT$</span>)</label><input id="dailyRewardInput" type="number" min="0"></div>
-   <div class="field"><label>滿 7 天加碼獎勵 (<span class="curr-unit">NT$</span>)</label><input id="weeklyRewardInput" type="number" min="0"></div>
+   <div class="field"><label>滿 7 天加碼週獎勵 (<span class="curr-unit">NT$</span>)</label><input id="weeklyRewardInput" type="number" min="0"></div>
 
    <div class="modalactions">
      <button onclick="closeCheckinConfigModal()">取消</button>
@@ -535,13 +613,17 @@ let data = {
   allTaskReward: 100,
   taskRerollCost: 10,
   taskStatus: { date: "", activeIds: [], completed: [] },
-  checkin: { lastDate: "", history: [], dailyReward: 20, weeklyReward: 200 },
+  checkin: { lastDate: "", count: 0, lastRetroDate: "", dailyReward: 20, weeklyReward: 200 },
   currency: "TWD",
   jpyRate: 0.21
 };
 
 let historyStack = [];
-let currentViewMode = localStorage.getItem("gacha-view-mode") || "auto"; // "auto", "mobile", "desktop"
+let currentViewMode = localStorage.getItem("gacha-view-mode") || "auto";
+
+// 字體大小設定 (0 = 縮小, 1 = 預設, 2 = 放大)
+const FONT_SCALES = [0.85, 1, 1.2];
+let currentFontScaleIndex = Number(localStorage.getItem("gacha-font-scale-index")) ?? 1;
 
 try {
   const savedData = JSON.parse(localStorage.getItem(KEY));
@@ -553,7 +635,8 @@ try {
     if (data.taskRerollCost === undefined) data.taskRerollCost = 10;
     if (data.dutyRerollCost === undefined) data.dutyRerollCost = 10;
     if (!data.taskStatus) data.taskStatus = { date: "", activeIds: [], completed: [] };
-    if (!data.checkin) data.checkin = { lastDate: "", history: [], dailyReward: 20, weeklyReward: 200 };
+    if (!data.checkin) data.checkin = { lastDate: "", count: 0, lastRetroDate: "", dailyReward: 20, weeklyReward: 200 };
+    if (data.checkin.count === undefined) data.checkin.count = 0;
     if (data.oshiReward === undefined) data.oshiReward = 50;
     if (!data.oshiIds) {
       if (savedData.oshiId) data.oshiIds = [savedData.oshiId];
@@ -565,6 +648,34 @@ try {
   }
 } catch (e) {
   console.error("讀取本地資料失敗，重置為預設值", e);
+}
+
+function setFontScale(index) {
+  currentFontScaleIndex = index;
+  applyFontSize();
+  localStorage.setItem("gacha-font-scale-index", currentFontScaleIndex);
+}
+
+function applyFontSize() {
+  let scale = FONT_SCALES[currentFontScaleIndex];
+  document.documentElement.style.setProperty('--font-scale', scale);
+  
+  let btnShrink = document.getElementById("fontShrinkBtn");
+  let btnDefault = document.getElementById("fontDefaultBtn");
+  let btnEnlarge = document.getElementById("fontEnlargeBtn");
+
+  [btnShrink, btnDefault, btnEnlarge].forEach(b => {
+    if (b) {
+      b.style.background = "transparent";
+      b.style.color = "white";
+    }
+  });
+
+  let activeBtn = currentFontScaleIndex === 0 ? btnShrink : (currentFontScaleIndex === 1 ? btnDefault : btnEnlarge);
+  if (activeBtn) {
+    activeBtn.style.background = "var(--card)";
+    activeBtn.style.color = "var(--gold)";
+  }
 }
 
 function toggleViewMode() {
@@ -584,18 +695,12 @@ function applyViewMode() {
   
   if (currentViewMode === "desktop") {
     body.classList.add("force-desktop");
-    if (btn) {
-      btn.textContent = "📱 切換為手機版";
-    }
+    if (btn) btn.textContent = "📱 手機版";
   } else if (currentViewMode === "mobile") {
     body.classList.add("force-mobile");
-    if (btn) {
-      btn.textContent = "💻 切換為電腦版";
-    }
+    if (btn) btn.textContent = "💻 電腦版";
   } else {
-    if (btn) {
-      btn.textContent = "💻 切換為電腦版";
-    }
+    if (btn) btn.textContent = "💻 電腦版";
   }
   localStorage.setItem("gacha-view-mode", currentViewMode);
 }
@@ -668,7 +773,11 @@ function updateRateDisplay() {
   }
 }
 
-function getTodayStr() { return new Date().toISOString().slice(0, 10); }
+function getCustomDayStr() {
+  let now = new Date();
+  now.setHours(now.getHours() - 3);
+  return now.toISOString().slice(0, 10);
+}
 
 function save() {
   historyStack.push(JSON.stringify(data));
@@ -795,11 +904,12 @@ function getMonthlyStats(filter) {
 }
 
 function checkAndAutoUpdateDuty() {
-  let today = getTodayStr();
+  let today = getCustomDayStr();
   if (data.dutyDate !== today || !data.dutyMemberIds || data.dutyMemberIds.length === 0) {
     if (data.members && data.members.length > 0) {
       data.dutyDate = today;
       data.dutyMemberIds = pickRandomMemberIds(3);
+      checkAndApplyOshiReward(false);
     }
   }
 }
@@ -812,7 +922,7 @@ function getDutyMembers() {
   let currentDuty = data.dutyMemberIds.map(id => membersMap.get(id)).filter(Boolean);
 
   if (currentDuty.length < Math.min(3, data.members.length)) {
-    data.dutyDate = getTodayStr();
+    data.dutyDate = getCustomDayStr();
     data.dutyMemberIds = pickRandomMemberIds(3);
     currentDuty = data.dutyMemberIds.map(id => membersMap.get(id)).filter(Boolean);
   }
@@ -824,6 +934,30 @@ function pickRandomMemberIds(count) {
   if (!data.members || data.members.length === 0) return [];
   let shuffled = [...data.members].sort(() => Math.random() - 0.5);
   return shuffled.slice(0, Math.min(count, shuffled.length)).map(m => m.id);
+}
+
+function checkAndApplyOshiReward(isManual) {
+  let membersMap = new Map(data.members.map(m => [m.id, m]));
+  let currentDuty = data.dutyMemberIds.map(id => membersMap.get(id)).filter(Boolean);
+  let oshiSet = new Set(data.oshiIds || []);
+
+  let hitOshiList = currentDuty.filter(m => oshiSet.has(m.id));
+  if (hitOshiList.length > 0) {
+    let rewardPerOshi = Number(data.oshiReward ?? 50);
+    let totalOshiReward = rewardPerOshi * hitOshiList.length;
+
+    if (totalOshiReward > 0) {
+      data.balance += totalOshiReward;
+      data.saved += totalOshiReward;
+      let namesStr = hitOshiList.map(m => m.name).join("、");
+      let actionPrefix = isManual ? "👑 重骰幸運抽中推し" : "🌟 每日值班成員自動更新抽中推し";
+      data.logs.push({
+        amount: totalOshiReward,
+        note: `${actionPrefix}【${namesStr}】(共 ${hitOshiList.length} 位)！`,
+        date: new Date().toLocaleString("zh-TW")
+      });
+    }
+  }
 }
 
 function rerollDutyMembers() {
@@ -847,29 +981,9 @@ function rerollDutyMembers() {
     });
   }
 
-  data.dutyDate = getTodayStr();
+  data.dutyDate = getCustomDayStr();
   data.dutyMemberIds = pickRandomMemberIds(3);
-
-  let membersMap = new Map(data.members.map(m => [m.id, m]));
-  let currentDuty = data.dutyMemberIds.map(id => membersMap.get(id)).filter(Boolean);
-  let oshiSet = new Set(data.oshiIds || []);
-
-  let hitOshiList = currentDuty.filter(m => oshiSet.has(m.id));
-  if (hitOshiList.length > 0) {
-    let rewardPerOshi = Number(data.oshiReward ?? 50);
-    let totalOshiReward = rewardPerOshi * hitOshiList.length;
-
-    if (totalOshiReward > 0) {
-      data.balance += totalOshiReward;
-      data.saved += totalOshiReward;
-      let namesStr = hitOshiList.map(m => m.name).join("、");
-      data.logs.push({
-        amount: totalOshiReward,
-        note: `👑 重骰幸運抽中推し【${namesStr}】(共 ${hitOshiList.length} 位)！`,
-        date: new Date().toLocaleString("zh-TW")
-      });
-    }
-  }
+  checkAndApplyOshiReward(true);
 
   save();
 }
@@ -880,7 +994,7 @@ function renderDutyMembers() {
   let costDesc = document.getElementById("dutyCostDesc");
   if (costDesc) {
     let cost = Number(data.dutyRerollCost ?? 10);
-    costDesc.textContent = `每次重骰扣除 ${money(cost)}，每日 0:00 自動更新成員`;
+    costDesc.textContent = `每次重骰扣除 ${money(cost)}，每日 3:00 自動更新成員`;
   }
   if (!container) return;
   
@@ -902,7 +1016,7 @@ function renderDutyMembers() {
 }
 
 function getDailyActiveTasks() {
-  let today = getTodayStr();
+  let today = getCustomDayStr();
   let pool = data.tasks || [];
   
   let needsNew = data.taskStatus.date !== today || !data.taskStatus.activeIds || data.taskStatus.activeIds.some(id => !pool.some(t => t.id === id));
@@ -963,7 +1077,7 @@ function rerollDailyTasks() {
   let newActiveIds = copyPool.slice(0, pickCount).map(t => t.id);
 
   data.taskStatus = {
-    date: getTodayStr(),
+    date: getCustomDayStr(),
     activeIds: newActiveIds,
     completed: []
   };
@@ -1022,7 +1136,7 @@ function renderTasks() {
   }
 
   if (activeTasks.length === 0) {
-    container.innerHTML = `<div class="empty" style="padding:10px 0;font-size:11px">任務庫少於 3 個任務</div>`;
+    container.innerHTML = `<div class="empty" style="padding:10px 0;font-size:0.68rem">任務庫少於 3 個任務</div>`;
     return;
   }
 
@@ -1030,8 +1144,8 @@ function renderTasks() {
     let isDone = completedList.includes(t.id);
     return `
       <div class="task-item ${isDone ? 'done' : ''}" style="padding:5px 8px;margin-bottom:4px">
-        <div class="task-title" style="font-size:11px" title="${esc(t.title)}">${esc(t.title)}</div>
-        <button class="task-btn ${isDone ? 'completed' : ''}" style="padding:3px 6px;font-size:10px" ${isDone ? 'disabled' : ''} onclick="completeTask(${t.id})">
+        <div class="task-title" style="font-size:0.68rem" title="${esc(t.title)}">${esc(t.title)}</div>
+        <button class="task-btn ${isDone ? 'completed' : ''}" style="padding:3px 6px;font-size:0.62rem" ${isDone ? 'disabled' : ''} onclick="completeTask(${t.id})">
           ${isDone ? '✓' : '完成'}
         </button>
       </div>
@@ -1040,53 +1154,56 @@ function renderTasks() {
 }
 
 function renderCheckin() {
-  let grid = document.getElementById("checkinGrid");
   let btn = document.getElementById("checkinBtn");
-  if (!grid || !btn) return;
+  let retroBtn = document.getElementById("retroCheckinBtn");
+  let progressText = document.getElementById("checkinProgressText");
+  let progressBar = document.getElementById("checkinProgressBar");
+  let rewardTip = document.getElementById("checkinRewardTip");
+  
+  if (!btn || !progressText || !progressBar) return;
 
-  let today = getTodayStr();
+  let today = getCustomDayStr();
   let isCheckedToday = data.checkin.lastDate === today;
+  let count = data.checkin.count || 0;
 
   btn.disabled = isCheckedToday;
   btn.textContent = isCheckedToday ? "今日已簽到 ✓" : "每日簽到";
 
-  let history = data.checkin.history || [];
-  let days = ["週一", "週二", "週三", "週四", "週五", "週六", "週日"];
-  
-  grid.innerHTML = days.map((dayName, idx) => {
-    let isDone = history.length > idx;
-    let isToday = history.length === idx && !isCheckedToday;
-    return `
-      <div class="checkin-day ${isDone ? 'done' : ''} ${isToday ? 'today' : ''}">
-        <div>${dayName}</div>
-        <div style="font-weight:bold;margin-top:1px">${isDone ? '✓' : idx + 1}</div>
-      </div>
-    `;
-  }).join("");
-}
-
-function doCheckin() {
-  let today = getTodayStr();
-  if (data.checkin.lastDate === today) return;
-
-  if (!data.checkin.history) data.checkin.history = [];
-
-  if (data.checkin.history.length >= 7) {
-    data.checkin.history = [];
+  let canRetro = !isCheckedToday && data.checkin.lastRetroDate !== today && count < 7;
+  if (retroBtn) {
+    retroBtn.style.display = canRetro ? "block" : "none";
   }
 
-  data.checkin.history.push(today);
-  data.checkin.lastDate = today;
+  progressText.textContent = `${count} / 7 天`;
+  let percent = Math.min(100, (count / 7) * 100);
+  progressBar.style.width = percent + "%";
+
+  let weeklyRev = money(data.checkin.weeklyReward ?? 200);
+  if (rewardTip) {
+    rewardTip.textContent = `滿 7 天加碼週獎勵：${weeklyRev}`;
+  }
+}
+
+function processCheckinReward(isRetro = false) {
+  let today = getCustomDayStr();
+  data.checkin.count = (data.checkin.count || 0) + 1;
+  
+  if (isRetro) {
+    data.checkin.lastRetroDate = today;
+  } else {
+    data.checkin.lastDate = today;
+  }
 
   let dailyReward = Number(data.checkin.dailyReward ?? 20);
   let weeklyReward = Number(data.checkin.weeklyReward ?? 200);
 
   let totalReward = dailyReward;
-  let noteStr = `每日簽到獎勵`;
+  let noteStr = isRetro ? `補簽到獎勵` : `每日簽到獎勵`;
 
-  if (data.checkin.history.length === 7) {
+  if (data.checkin.count >= 7) {
     totalReward += weeklyReward;
-    noteStr = `連續 7 天簽到大禮包！`;
+    noteStr = isRetro ? `補簽到達成滿 7 天大禮包！` : `連續 7 天簽到加碼週獎勵！`;
+    data.checkin.count = 0;
   }
 
   if (totalReward > 0) {
@@ -1104,10 +1221,27 @@ function doCheckin() {
   save();
 }
 
+function doCheckin() {
+  let today = getCustomDayStr();
+  if (data.checkin.lastDate === today) return;
+  processCheckinReward(false);
+}
+
+function doRetroCheckin() {
+  let today = getCustomDayStr();
+  if (data.checkin.lastDate === today) return alert("今天已經完成簽到了，無需補簽！");
+  if (data.checkin.lastRetroDate === today) return alert("今天已經使用過補簽功能了（一天只能補簽一次）！");
+  
+  if (confirm("確定要使用 1 次補簽機會來增加 1 天簽到進度嗎？")) {
+    processCheckinReward(true);
+  }
+}
+
 function clearCheckinData() {
-  if (confirm("確定要清除目前的簽到資料嗎？")) {
+  if (confirm("確定要重置目前的簽到進度嗎？")) {
     data.checkin.lastDate = "";
-    data.checkin.history = [];
+    data.checkin.count = 0;
+    data.checkin.lastRetroDate = "";
     save();
   }
 }
@@ -1143,7 +1277,7 @@ function render() {
       let p = Math.min(100, (g.current / g.target) * 100);
       let imgHtml = g.img ? `<img src="${g.img}" class="thumb">` : '';
       let catNameStr = gameName(g.game);
-      return `<div class="goal"><div style="display:flex;gap:12px;align-items:center;flex:1">${imgHtml}<div><div class="goal-name">${catNameStr ? catNameStr + " · " : ""}${esc(g.name)}</div><div class="muted">${money(g.current)} / ${money(g.target)}</div><div class="bar goal-bar" style="height:6px;background:#2d3754;border-radius:99px;margin-top:4px"><div class="fill" style="width:${p}%;height:100%;background:linear-gradient(90deg,#7d6cff,#c29cff);border-radius:99px"></div></div></div></div><div><button class="primary" onclick="openFundModal(${g._i})">目標</button><button class="btn-del" onclick="deleteGoal(${g._i})">✕</button></div></div>`;
+      return `<div class="goal"><div style="display:flex;gap:8px;align-items:center;flex:1;min-width:0">${imgHtml}<div style="min-width:0;flex:1"><div class="goal-name">${catNameStr ? catNameStr + " · " : ""}${esc(g.name)}</div><div class="muted">${money(g.current)} / ${money(g.target)}</div><div class="bar goal-bar" style="height:6px;background:#2d3754;border-radius:99px;margin-top:4px"><div class="fill" style="width:${p}%;height:100%;background:linear-gradient(90deg,#7d6cff,#c29cff);border-radius:99px"></div></div></div></div><div style="flex-shrink:0"><button class="primary" onclick="openFundModal(${g._i})">目標</button><button class="btn-del" onclick="deleteGoal(${g._i})">✕</button></div></div>`;
     }).join("") : '<div class="empty">還沒有課金目標。</div>';
   }
 
@@ -1153,7 +1287,7 @@ function render() {
     logContainer.innerHTML = visibleLogs.length ? visibleLogs.slice().reverse().map(l => {
       let imgHtml = l.img ? `<img src="${l.img}" class="thumb">` : '';
       let catNameStr = gameName(l.game);
-      return `<div class="logrow"><div style="display:flex;gap:12px;align-items:center">${imgHtml}<div><b>${catNameStr ? catNameStr + " · " : ""}${esc(l.note || l.type)}</b><div class="muted">${l.date}</div></div></div><div style="display:flex;align-items:center;gap:8px"><b class="${l.amount > 0 ? 'plus' : 'minus'}">${l.amount > 0 ? '+' : ''}${money(l.amount)}</b><button class="btn-del" onclick="deleteLog(${l._i})">✕</button></div></div>`;
+      return `<div class="logrow"><div style="display:flex;gap:8px;align-items:center;min-width:0;flex:1">${imgHtml}<div style="min-width:0;flex:1"><b>${catNameStr ? catNameStr + " · " : ""}${esc(l.note || l.type)}</b><div class="muted">${l.date}</div></div></div><div style="display:flex;align-items:center;gap:6px;flex-shrink:0"><b class="${l.amount > 0 ? 'plus' : 'minus'}">${l.amount > 0 ? '+' : ''}${money(l.amount)}</b><button class="btn-del" onclick="deleteLog(${l._i})">✕</button></div></div>`;
     }).join("") : '<div class="empty">還沒有紀錄。</div>';
   }
 }
@@ -1394,11 +1528,11 @@ function renderMemberList() {
           <img src="${m.img}" style="width:36px;height:48px;border-radius:6px;object-fit:cover;border:1px solid var(--line)">
           <div>
             <b>${esc(m.name)}</b>
-            ${isOshi ? '<div style="font-size:11px;color:var(--gold);font-weight:bold">👑 推し中</div>' : ''}
+            ${isOshi ? '<div style="font-size:0.68rem;color:var(--gold);font-weight:bold">👑 推し中</div>' : ''}
           </div>
         </div>
         <div style="display:flex;gap:4px;align-items:center">
-          <button onclick="toggleOshi(${m.id})" style="padding:4px 8px;font-size:12px;background:${isOshi ? '#3a202a' : '#151a2b'};color:${isOshi ? '#ff9ab0' : 'white'}">
+          <button onclick="toggleOshi(${m.id})" style="padding:4px 8px;font-size:0.75rem;background:${isOshi ? '#3a202a' : '#151a2b'};color:${isOshi ? '#ff9ab0' : 'white'}">
             ${isOshi ? '✓ 取消推し' : '👑 設為推し'}
           </button>
           <button class="btn-edit" onclick="openEditMemberModal(${m.id})">✏️ 編輯</button>
@@ -1596,6 +1730,7 @@ document.addEventListener("DOMContentLoaded", () => {
   updateDropdowns();
   updateCurrencyUnitUI();
   applyViewMode();
+  applyFontSize();
   fetchBotRate();
   render();
 });
