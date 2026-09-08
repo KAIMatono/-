@@ -378,7 +378,7 @@ body.force-desktop .checkin-task-compact h2 { font-size: 1.12rem !important; mar
             <button onclick="openMemberModal()" style="padding:4px 8px;font-size:0.75rem">管理成員</button>
           </div>
         </div>
-        <div style="font-size:0.68rem;color:var(--muted);margin-bottom:8px" id="dutyCostDesc">每次重骰扣除 10 元，每日 3:00 自動更新成員</div>
+        <div style="font-size:0.68rem;color:var(--muted);margin-bottom:8px" id="dutyCostDesc">每次重骰扣除 10 元，每日 3:00 自動更新成員與自動加碼</div>
         <div id="dutyMemberArea">
           <div class="empty">尚無成員照片，點擊右上角「管理成員」上傳吧！</div>
         </div>
@@ -1019,7 +1019,7 @@ function renderDutyMembers() {
   let costDesc = document.getElementById("dutyCostDesc");
   if (costDesc) {
     let cost = Number(data.dutyRerollCost ?? 10);
-    costDesc.textContent = `每次重骰扣除 ${money(cost)}，每日 3:00 自動更新成員`;
+    costDesc.textContent = `每次重骰扣除 ${money(cost)}，每日 3:00 自動更新成員與自動加碼`;
   }
   if (!container) return;
   
