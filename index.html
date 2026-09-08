@@ -389,9 +389,8 @@ body.force-desktop .checkin-task-compact h2 { font-size: 1.12rem !important; mar
             <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">
               <h2 style="margin:0">📅 簽到</h2>
               <div style="display:flex;gap:4px">
-                <button onclick="resetMonthlyCheckin()" title="重製簽到" style="padding:3px 6px;font-size:0.68rem;background:#4a3220;color:#ffd36a">🔄</button>
-                <button onclick="clearCheckinData()" title="清除今日簽到" style="padding:3px 6px;font-size:0.68rem;background:#4a2032;color:#ffb1c5">🗑️</button>
-                <button onclick="openCheckinConfigModal()" style="padding:3px 6px;font-size:0.68rem">設定</button>
+                <button onclick="clearCheckinData()" title="清除今日簽到（歸零記錄並收回獎勵）" style="padding:3px 6px;font-size:0.75rem;background:#4a2032;color:#ffb1c5">🗑️</button>
+                <button onclick="openCheckinConfigModal()" title="設定" style="padding:3px 6px;font-size:0.75rem">⚙️</button>
               </div>
             </div>
 
@@ -625,7 +624,7 @@ let data = {
   allTaskReward: 100,
   taskRerollCost: 10,
   taskStatus: { date: "", activeIds: [], completed: [] },
-  checkin: { lastDate: "", count: 0, lastRetroDate: "", dailyReward: 20, weeklyReward: 200, monthlyReward: 1000, monthCount: 0, monthRecordDate: "" },
+  checkin: { lastDate: "", count: 0, dailyReward: 20, weeklyReward: 200, monthlyReward: 1000, monthCount: 0, monthRecordDate: "", lastRewardEarned: 0, lastRetroDate: "", retroEarned: 0 },
   currency: "TWD",
   jpyRate: 0.21
 };
@@ -647,10 +646,13 @@ try {
     if (data.taskRerollCost === undefined) data.taskRerollCost = 10;
     if (data.dutyRerollCost === undefined) data.dutyRerollCost = 10;
     if (!data.taskStatus) data.taskStatus = { date: "", activeIds: [], completed: [] };
-    if (!data.checkin) data.checkin = { lastDate: "", count: 0, lastRetroDate: "", dailyReward: 20, weeklyReward: 200, monthlyReward: 1000, monthCount: 0, monthRecordDate: "" };
+    if (!data.checkin) data.checkin = { lastDate: "", count: 0, dailyReward: 20, weeklyReward: 200, monthlyReward: 1000, monthCount: 0, monthRecordDate: "", lastRewardEarned: 0, lastRetroDate: "", retroEarned: 0 };
     if (data.checkin.count === undefined) data.checkin.count = 0;
     if (data.checkin.monthCount === undefined) data.checkin.monthCount = 0;
     if (data.checkin.monthlyReward === undefined) data.checkin.monthlyReward = 1000;
+    if (data.checkin.lastRewardEarned === undefined) data.checkin.lastRewardEarned = 0;
+    if (data.checkin.lastRetroDate === undefined) data.checkin.lastRetroDate = "";
+    if (data.checkin.retroEarned === undefined) data.checkin.retroEarned = 0;
     if (data.oshiReward === undefined) data.oshiReward = 50;
     if (!data.oshiIds) {
       if (savedData.oshiId) data.oshiIds = [savedData.oshiId];
@@ -1195,7 +1197,7 @@ function renderCheckin() {
   btn.disabled = isCheckedToday;
   btn.textContent = isCheckedToday ? "今日已簽到 ✓" : "每日簽到";
 
-  let canRetro = !isCheckedToday && data.checkin.lastRetroDate !== today && count < 7;
+  let canRetro = data.checkin.lastRetroDate !== today && count < 7;
   if (retroBtn) {
     retroBtn.style.display = canRetro ? "block" : "none";
   }
@@ -1236,6 +1238,16 @@ function processCheckinReward(isRetro = false) {
   
   if (isRetro) {
     data.checkin.lastRetroDate = today;
+    // 補簽只增加進度，不發放獎勵，故 retroEarned 設為 0
+    data.checkin.retroEarned = 0;
+    
+    // 雖然補簽不發放獎勵，但若剛好湊滿 7 天，是否要觸發週獎勵？依照「補簽只會增加進度不會發放獎勵」的需求，此處僅增加進度，不發放獎勵與週獎勵加碼。
+    if (data.checkin.count >= 7) {
+      data.checkin.count = 0;
+    }
+
+    save();
+    return;
   } else {
     data.checkin.lastDate = today;
   }
@@ -1245,19 +1257,21 @@ function processCheckinReward(isRetro = false) {
   let monthlyReward = Number(data.checkin.monthlyReward ?? 1000);
 
   let totalReward = dailyReward;
-  let noteStr = isRetro ? `補簽到獎勵` : `每日簽到獎勵`;
+  let noteStr = `每日簽到獎勵`;
 
   if (data.checkin.count >= 7) {
     totalReward += weeklyReward;
-    noteStr = isRetro ? `補簽到達成滿 7 天大禮包！` : `連續 7 天簽到加碼週獎勵！`;
+    noteStr = `連續 7 天簽到加碼週獎勵！`;
     data.checkin.count = 0;
   }
 
-  // 檢查是否達成滿 30 天月簽到獎勵
   if (data.checkin.monthCount === 30) {
     totalReward += monthlyReward;
     noteStr += ` ＆ 本月簽到滿 30 天月獎勵！`;
   }
+
+  // 記錄本次簽到所獲得的獎勵總額，供清除時扣除
+  data.checkin.lastRewardEarned = totalReward;
 
   if (totalReward > 0) {
     data.balance += totalReward;
@@ -1282,27 +1296,62 @@ function doCheckin() {
 
 function doRetroCheckin() {
   let today = getCustomDayStr();
-  if (data.checkin.lastDate === today) return alert("今天已經完成簽到了，無需補簽！");
   if (data.checkin.lastRetroDate === today) return alert("今天已經使用過補簽功能了（一天只能補簽一次）！");
   
-  if (confirm("確定要使用 1 次補簽機會來增加 1 天簽到進度嗎？")) {
+  if (confirm("確定要使用 1 次補簽機會來增加 1 天簽到進度嗎？（註：補簽只會增加進度，不會發放獎勵）")) {
     processCheckinReward(true);
   }
 }
 
 function clearCheckinData() {
-  if (confirm("確定要清除今天的簽到狀態嗎？")) {
-    data.checkin.lastDate = "";
-    save();
-  }
-}
+  let today = getCustomDayStr();
+  let hasNormal = data.checkin.lastDate === today;
+  let hasRetro = data.checkin.lastRetroDate === today;
 
-function resetMonthlyCheckin() {
-  if (confirm("確定要重製簽到進度嗎？這將會把連續簽到天數與本月簽到天數歸零。")) {
+  if (!hasNormal && !hasRetro) {
+    return alert("今天尚未進行任何簽到或補簽，無需清除！");
+  }
+
+  let confirmMsg = hasRetro && !hasNormal 
+    ? "確定要清除今天的補簽記錄嗎？這將會把補簽增加的進度扣除。" 
+    : "確定要清除今天的簽到記錄嗎？這將會把簽到記錄天數調降並收回今日獲得的獎勵（若今天有補簽也會一併清除）。";
+
+  if (confirm(confirmMsg)) {
+    let earned = data.checkin.lastRewardEarned || 0;
+    
+    // 依據清除項目計算要扣除的進度天數
+    let daysToDecrease = 0;
+    if (hasNormal) daysToDecrease++;
+    if (hasRetro) daysToDecrease++;
+
+    // 降回天數與狀態
+    data.checkin.count = Math.max(0, (data.checkin.count || 0) - daysToDecrease);
+    data.checkin.monthCount = Math.max(0, (data.checkin.monthCount || 0) - daysToDecrease);
+    
     data.checkin.lastDate = "";
-    data.checkin.count = 0;
     data.checkin.lastRetroDate = "";
-    data.checkin.monthCount = 0;
+    data.checkin.lastRewardEarned = 0;
+    data.checkin.retroEarned = 0;
+
+    // 只有當今天有「正常簽到」獲得獎勵時才扣除金庫金額與記錄
+    if (hasNormal && earned > 0) {
+      data.balance -= earned;
+      data.saved = Math.max(0, data.saved - earned);
+      if (!data.logs) data.logs = [];
+      data.logs.push({
+        amount: -earned,
+        note: "🗑️ 清除今日簽到（歸零並收回獎勵）",
+        date: new Date().toLocaleString("zh-TW")
+      });
+    } else if (hasRetro && !hasNormal) {
+      if (!data.logs) data.logs = [];
+      data.logs.push({
+        amount: 0,
+        note: "🗑️ 清除今日補簽記錄",
+        date: new Date().toLocaleString("zh-TW")
+      });
+    }
+
     save();
   }
 }
