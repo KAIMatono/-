@@ -33,8 +33,10 @@ html {
 * { box-sizing: border-box; }
 body {
   margin: 0;
-  background-size: cover;
+  /* 調整為 contain、置中、不重複，確保圖片能完整放進去且不超出範圍 */
+  background-size: contain;
   background-position: center;
+  background-repeat: no-repeat;
   background-attachment: fixed;
   color: var(--text);
   font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", "Noto Sans TC", sans-serif;
@@ -869,10 +871,17 @@ function updateBackground(filter) {
   let maskAlpha = (1 - opacity) * 0.85;
 
   if (customBg) {
+    // 確保自訂背景圖片使用 contain 完整顯示且不超出範圍
     document.body.style.backgroundImage = `linear-gradient(rgba(10,13,24,${maskAlpha}), rgba(10,13,24,${maskAlpha})), url('${customBg}')`;
+    document.body.style.backgroundSize = "contain";
+    document.body.style.backgroundPosition = "center";
+    document.body.style.backgroundRepeat = "no-repeat";
     document.body.className = currentViewMode === "mobile" ? 'force-mobile' : (currentViewMode === "desktop" ? 'force-desktop' : '');
   } else {
     document.body.style.backgroundImage = '';
+    document.body.style.backgroundSize = "";
+    document.body.style.backgroundPosition = "";
+    document.body.style.backgroundRepeat = "";
     let modeClass = currentViewMode === "mobile" ? 'force-mobile' : (currentViewMode === "desktop" ? 'force-desktop' : '');
     document.body.className = `bg-${filter} ${modeClass}`.trim();
     document.body.style.filter = `brightness(${0.4 + opacity * 0.6})`;
@@ -1238,10 +1247,8 @@ function processCheckinReward(isRetro = false) {
   
   if (isRetro) {
     data.checkin.lastRetroDate = today;
-    // 補簽只增加進度，不發放獎勵，故 retroEarned 設為 0
     data.checkin.retroEarned = 0;
     
-    // 雖然補簽不發放獎勵，但若剛好湊滿 7 天，是否要觸發週獎勵？依照「補簽只會增加進度不會發放獎勵」的需求，此處僅增加進度，不發放獎勵與週獎勵加碼。
     if (data.checkin.count >= 7) {
       data.checkin.count = 0;
     }
@@ -1270,7 +1277,6 @@ function processCheckinReward(isRetro = false) {
     noteStr += ` ＆ 本月簽到滿 30 天月獎勵！`;
   }
 
-  // 記錄本次簽到所獲得的獎勵總額，供清除時扣除
   data.checkin.lastRewardEarned = totalReward;
 
   if (totalReward > 0) {
@@ -1319,12 +1325,10 @@ function clearCheckinData() {
   if (confirm(confirmMsg)) {
     let earned = data.checkin.lastRewardEarned || 0;
     
-    // 依據清除項目計算要扣除的進度天數
     let daysToDecrease = 0;
     if (hasNormal) daysToDecrease++;
     if (hasRetro) daysToDecrease++;
 
-    // 降回天數與狀態
     data.checkin.count = Math.max(0, (data.checkin.count || 0) - daysToDecrease);
     data.checkin.monthCount = Math.max(0, (data.checkin.monthCount || 0) - daysToDecrease);
     
@@ -1333,7 +1337,6 @@ function clearCheckinData() {
     data.checkin.lastRewardEarned = 0;
     data.checkin.retroEarned = 0;
 
-    // 只有當今天有「正常簽到」獲得獎勵時才扣除金庫金額與記錄
     if (hasNormal && earned > 0) {
       data.balance -= earned;
       data.saved = Math.max(0, data.saved - earned);
