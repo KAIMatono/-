@@ -500,7 +500,7 @@ body.force-desktop .checkin-task-compact h2 { font-size: 1.12rem !important; mar
 <!-- 詳細課金目標瀏覽對話框 -->
 <div class="modal" id="allGoalsModal">
  <div class="modalbox" style="width:min(560px, 100%);">
-   <h3>🎯 所有課金目標詳細列表</h3>
+   <h3>🎯 所有課金目標詳細記錄</h3>
    <div id="allGoalsList" style="max-height: 60vh; overflow-y: auto; display: flex; flex-direction: column; gap: 8px; margin-top: 10px;"></div>
    <div class="modalactions" style="margin-top:20px"><button onclick="closeAllGoalsModal()">關閉</button></div>
  </div>
@@ -509,7 +509,7 @@ body.force-desktop .checkin-task-compact h2 { font-size: 1.12rem !important; mar
 <!-- 完整歷史紀錄瀏覽對話框 -->
 <div class="modal" id="allLogsModal">
  <div class="modalbox" style="width:min(560px, 100%);">
-   <h3>📜 完整歷史紀錄詳細列表</h3>
+   <h3>📜 完整歷史記錄詳細記錄</h3>
    <div id="allLogsList" style="max-height: 60vh; overflow-y: auto; display: flex; flex-direction: column; gap: 8px; margin-top: 10px;"></div>
    <div class="modalactions" style="margin-top:20px"><button onclick="closeAllLogsModal()">關閉</button></div>
  </div>
@@ -1447,7 +1447,7 @@ function renderAllGoalsList() {
     let p = Math.min(100, (g.current / g.target) * 100);
     let imgHtml = g.img ? `<img src="${g.img}" class="thumb">` : '';
     let catNameStr = gameName(g.game);
-    return `<div class="goal"><div style="display:flex;gap:8px;align-items:center;flex:1;min-width:0">${imgHtml}<div style="min-width:0;flex:1"><div class="goal-name">${catNameStr ? catNameStr + " · " : ""}${esc(g.name)}</div><div class="muted">${money(g.current)} / ${money(g.target)}</div><div class="bar goal-bar" style="height:6px;background:#2d3754;border-radius:99px;margin-top:4px"><div class="fill" style="width:${p}%;height:100%;background:linear-gradient(90deg,#7d6cff,#c29cff);border-radius:99px"></div></div></div></div><div style="flex-shrink:0"><button class="primary" onclick="openFundModal(${g._i}); closeAllGoalsModal();">目標</button><button class="btn-del" onclick="deleteGoal(${g._i}); renderAllGoalsList();">✕</button></div></div>`;
+    return `<div class="goal" style="align-items: flex-start;"><div style="display:flex;gap:8px;align-items:flex-start;flex:1;min-width:0">${imgHtml}<div style="min-width:0;flex:1"><div class="goal-name" style="white-space:normal; word-break:break-all;">${catNameStr ? catNameStr + " · " : ""}${esc(g.name)}</div><div class="muted">${money(g.current)} / ${money(g.target)}</div><div class="bar goal-bar" style="width:100%;height:6px;background:#2d3754;border-radius:99px;margin-top:6px"><div class="fill" style="width:${p}%;height:100%;background:linear-gradient(90deg,#7d6cff,#c29cff);border-radius:99px"></div></div></div></div><div style="flex-shrink:0;display:flex;gap:4px;"><button class="primary" onclick="openFundModal(${g._i}); closeAllGoalsModal();">目標</button><button class="btn-del" onclick="deleteGoal(${g._i}); renderAllGoalsList();">✕</button></div></div>`;
   }).join("");
 }
 
@@ -1473,7 +1473,7 @@ function renderAllLogsList() {
   container.innerHTML = visibleLogs.slice().reverse().map(l => {
     let imgHtml = l.img ? `<img src="${l.img}" class="thumb">` : '';
     let catNameStr = gameName(l.game);
-    return `<div class="logrow"><div style="display:flex;gap:8px;align-items:center;min-width:0;flex:1">${imgHtml}<div style="min-width:0;flex:1"><b>${catNameStr ? catNameStr + " · " : ""}${esc(l.note || l.type)}</b><div class="muted">${l.date}</div></div></div><div style="display:flex;align-items:center;gap:6px;flex-shrink:0"><b class="${l.amount > 0 ? 'plus' : 'minus'}">${l.amount > 0 ? '+' : ''}${money(l.amount)}</b><button class="btn-del" onclick="deleteLog(${l._i}); renderAllLogsList();">✕</button></div></div>`;
+    return `<div class="logrow" style="align-items: flex-start;"><div style="display:flex;gap:8px;align-items:flex-start;min-width:0;flex:1">${imgHtml}<div style="min-width:0;flex:1"><b style="white-space:normal; word-break:break-all; display:block; max-width:none;">${catNameStr ? catNameStr + " · " : ""}${esc(l.note || l.type)}</b><div class="muted">${l.date}</div></div></div><div style="display:flex;align-items:center;gap:6px;flex-shrink:0"><b class="${l.amount > 0 ? 'plus' : 'minus'}">${l.amount > 0 ? '+' : ''}${money(l.amount)}</b><button class="btn-del" onclick="deleteLog(${l._i}); renderAllLogsList();">✕</button></div></div>`;
   }).join("");
 }
 
