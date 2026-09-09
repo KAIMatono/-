@@ -1,3 +1,4 @@
+```html[cite: 9]
 <!doctype html>
 <html lang="zh-Hant">
 <head>
@@ -120,9 +121,9 @@ body.force-desktop .duty-card { aspect-ratio: 3/4.6; }
 /* 每日任務樣式 - 嚴格單行不換行配置 */
 .task-item { 
   display: grid; 
-  grid-template-columns: 1fr auto; 
+  grid-template-columns: 1fr auto auto; 
   align-items: center; 
-  gap: 8px; 
+  gap: 6px; 
   padding: 7px 10px; 
   background: #151a2b; 
   border: 1px solid var(--line); 
@@ -149,6 +150,17 @@ body.force-desktop .duty-card { aspect-ratio: 3/4.6; }
   flex-shrink: 0;
 }
 .task-btn.completed { background: #2f3b5c; color: var(--good); }
+.task-replace-btn {
+  padding: 4px 6px;
+  font-size: 0.62rem;
+  background: #293250;
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  white-space: nowrap;
+  flex-shrink: 0;
+  color: var(--muted);
+}
+.task-replace-btn:hover { color: var(--text); border-color: var(--accent); }
 
 /* 手動切換排版模式樣式 */
 body.force-mobile .app { max-width: 480px !important; padding: 16px 10px 40px !important; }
@@ -378,7 +390,6 @@ body.force-desktop .checkin-task-compact h2 { font-size: 1.12rem !important; mar
             <button onclick="openMemberModal()" style="padding:4px 8px;font-size:0.75rem">管理成員</button>
           </div>
         </div>
-        <div style="font-size:0.68rem;color:var(--muted);margin-bottom:8px" id="dutyCostDesc">每次重骰扣除 10 元，每日 3:00 自動更新成員與自動加碼</div>
         <div id="dutyMemberArea">
           <div class="empty">尚無成員照片，點擊右上角「管理成員」上傳吧！</div>
         </div>
@@ -430,7 +441,6 @@ body.force-desktop .checkin-task-compact h2 { font-size: 1.12rem !important; mar
             <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">
               <div style="display:flex;align-items:center;gap:4px">
                 <h2 style="margin:0">📋 任務</h2>
-                <button id="rerollTaskBtn" onclick="rerollDailyTasks()" style="padding:3px 6px;font-size:0.68rem;background:var(--accent)">🎲</button>
               </div>
               <button onclick="openTaskModal()" style="padding:3px 6px;font-size:0.68rem">⚙️</button>
             </div>
@@ -515,6 +525,7 @@ body.force-desktop .checkin-task-compact h2 { font-size: 1.12rem !important; mar
 <div class="modal" id="memberModal">
  <div class="modalbox">
    <h3>🌟 管理成員與推し</h3>
+   
    <div class="field"><label>成員姓名</label><input id="memberNameInput" placeholder="例如：的野美青 / 森田ひかる"></div>
    <div class="field"><label>成員照片</label><input id="memberImgInput" type="file" accept="image/*"></div>
    <button class="primary" style="width:100%;margin-top:4px" onclick="addMember()">新增成員</button>
@@ -527,7 +538,7 @@ body.force-desktop .checkin-task-compact h2 { font-size: 1.12rem !important; mar
    </div>
 
    <div class="field">
-     <label>🎲 重骰值班成員扣除金額 (<span class="curr-unit">NT$</span>)</label>
+     <label>🎲 每日首次重骰免費，後續每次重骰扣除 (<span class="curr-unit">NT$</span>)</label>
      <input id="dutyRerollCostInput" type="number" min="0" placeholder="例如：10" onchange="saveDutyRerollCost(this.value)">
    </div>
 
@@ -563,14 +574,6 @@ body.force-desktop .checkin-task-compact h2 { font-size: 1.12rem !important; mar
      <div style="display:flex;gap:8px">
        <input id="allTaskRewardInput" type="number" min="0" placeholder="例如：100" style="flex:1">
        <button class="primary" onclick="saveTaskReward()">儲存獎勵</button>
-     </div>
-   </div>
-
-   <div class="field" style="margin-top:16px">
-     <label>重骰每日任務扣除金額 (<span class="curr-unit">NT$</span>)</label>
-     <div style="display:flex;gap:8px">
-       <input id="taskRerollCostInput" type="number" min="0" placeholder="例如：10" style="flex:1">
-       <button class="primary" onclick="saveTaskRerollCost()">儲存費用</button>
      </div>
    </div>
 
@@ -620,12 +623,11 @@ const DEFAULT_CATEGORIES = [
 let data = { 
   balance: 0, saved: 0, spent: 0, goals: [], logs: [], bgMap: {}, bgOpacity: 100, members: [],
   oshiIds: [], oshiReward: 50,
-  dutyDate: "", dutyMemberIds: [], dutyRerollCost: 10,
+  dutyDate: "", dutyMemberIds: [], dutyRerollCost: 10, dutyRerollCountToday: 0,
   categories: DEFAULT_CATEGORIES,
   tasks: DEFAULT_TASKS,
   allTaskReward: 100,
-  taskRerollCost: 10,
-  taskStatus: { date: "", activeIds: [], completed: [] },
+  taskStatus: { date: "", activeIds: [], completed: [], replacedIds: [] },
   checkin: { lastDate: "", count: 0, dailyReward: 20, weeklyReward: 200, monthlyReward: 1000, monthCount: 0, monthRecordDate: "", lastRewardEarned: 0, lastRetroDate: "", retroEarned: 0 },
   currency: "TWD",
   jpyRate: 0.21
@@ -645,9 +647,10 @@ try {
     if (!data.categories || data.categories.length === 0) data.categories = DEFAULT_CATEGORIES;
     if (!data.tasks || data.tasks.length === 0) data.tasks = DEFAULT_TASKS;
     if (data.allTaskReward === undefined) data.allTaskReward = 100;
-    if (data.taskRerollCost === undefined) data.taskRerollCost = 10;
     if (data.dutyRerollCost === undefined) data.dutyRerollCost = 10;
-    if (!data.taskStatus) data.taskStatus = { date: "", activeIds: [], completed: [] };
+    if (data.dutyRerollCountToday === undefined) data.dutyRerollCountToday = 0;
+    if (!data.taskStatus) data.taskStatus = { date: "", activeIds: [], completed: [], replacedIds: [] };
+    if (!data.taskStatus.replacedIds) data.taskStatus.replacedIds = [];
     if (!data.checkin) data.checkin = { lastDate: "", count: 0, dailyReward: 20, weeklyReward: 200, monthlyReward: 1000, monthCount: 0, monthRecordDate: "", lastRewardEarned: 0, lastRetroDate: "", retroEarned: 0 };
     if (data.checkin.count === undefined) data.checkin.count = 0;
     if (data.checkin.monthCount === undefined) data.checkin.monthCount = 0;
@@ -871,7 +874,6 @@ function updateBackground(filter) {
   let maskAlpha = (1 - opacity) * 0.85;
 
   if (customBg) {
-    // 確保自訂背景圖片使用 contain 完整顯示且不超出範圍
     document.body.style.backgroundImage = `linear-gradient(rgba(10,13,24,${maskAlpha}), rgba(10,13,24,${maskAlpha})), url('${customBg}')`;
     document.body.style.backgroundSize = "contain";
     document.body.style.backgroundPosition = "center";
@@ -930,9 +932,12 @@ function getMonthlyStats(filter) {
 
 function checkAndAutoUpdateDuty() {
   let today = getCustomDayStr();
-  if (data.dutyDate !== today || !data.dutyMemberIds || data.dutyMemberIds.length === 0) {
+  if (data.dutyDate !== today) {
+    data.dutyDate = today;
+    data.dutyRerollCountToday = 0; // 每日凌晨 3:00 只更新重骰免費次數，不更新成員
+  }
+  if (!data.dutyMemberIds || data.dutyMemberIds.length === 0) {
     if (data.members && data.members.length > 0) {
-      data.dutyDate = today;
       data.dutyMemberIds = pickRandomMemberIds(3);
       checkAndApplyOshiReward(false);
     }
@@ -947,7 +952,6 @@ function getDutyMembers() {
   let currentDuty = data.dutyMemberIds.map(id => membersMap.get(id)).filter(Boolean);
 
   if (currentDuty.length < Math.min(3, data.members.length)) {
-    data.dutyDate = getCustomDayStr();
     data.dutyMemberIds = pickRandomMemberIds(3);
     currentDuty = data.dutyMemberIds.map(id => membersMap.get(id)).filter(Boolean);
   }
@@ -975,7 +979,7 @@ function checkAndApplyOshiReward(isManual) {
       data.balance += totalOshiReward;
       data.saved += totalOshiReward;
       let namesStr = hitOshiList.map(m => m.name).join("、");
-      let actionPrefix = isManual ? "👑 重骰幸運抽中推し" : "🌟 每日值班成員自動更新抽中推し";
+      let actionPrefix = isManual ? "👑 重骰幸運抽中推し" : "🌟 初始值班成員抽中推し";
       data.logs.push({
         amount: totalOshiReward,
         note: `${actionPrefix}【${namesStr}】(共 ${hitOshiList.length} 位)！`,
@@ -990,12 +994,20 @@ function rerollDutyMembers() {
     return alert("請先新增成員！");
   }
 
-  let cost = Number(data.dutyRerollCost ?? 10);
-  if (data.balance < cost) {
+  let today = getCustomDayStr();
+  if (data.dutyDate !== today) {
+    data.dutyDate = today;
+    data.dutyRerollCountToday = 0;
+  }
+
+  let isFree = (data.dutyRerollCountToday || 0) === 0;
+  let cost = isFree ? 0 : Number(data.dutyRerollCost ?? 10);
+
+  if (!isFree && data.balance < cost) {
     return alert(`金庫額度不足 ${money(cost)}，無法進行重骰！`);
   }
 
-  if (cost > 0) {
+  if (!isFree && cost > 0) {
     data.balance -= cost;
     data.spent += cost;
     if (!data.logs) data.logs = [];
@@ -1006,7 +1018,8 @@ function rerollDutyMembers() {
     });
   }
 
-  data.dutyDate = getCustomDayStr();
+  data.dutyRerollCountToday = (data.dutyRerollCountToday || 0) + 1;
+  data.dutyDate = today;
   data.dutyMemberIds = pickRandomMemberIds(3);
   checkAndApplyOshiReward(true);
 
@@ -1016,11 +1029,6 @@ function rerollDutyMembers() {
 function renderDutyMembers() {
   let members = getDutyMembers();
   let container = document.getElementById("dutyMemberArea");
-  let costDesc = document.getElementById("dutyCostDesc");
-  if (costDesc) {
-    let cost = Number(data.dutyRerollCost ?? 10);
-    costDesc.textContent = `每次重骰扣除 ${money(cost)}，每日 3:00 自動更新成員與自動加碼`;
-  }
   if (!container) return;
   
   if (members.length > 0) {
@@ -1056,56 +1064,41 @@ function getDailyActiveTasks() {
     let pickCount = Math.min(3, copyPool.length);
     let activeIds = copyPool.slice(0, pickCount).map(t => t.id);
     
-    data.taskStatus = { date: today, activeIds: activeIds, completed: [] };
+    data.taskStatus = { date: today, activeIds: activeIds, completed: [], replacedIds: [] };
+  }
+  if (!data.taskStatus.replacedIds) {
+    data.taskStatus.replacedIds = [];
   }
   return data.taskStatus.activeIds;
 }
 
-function rerollDailyTasks() {
-  let tasks = data.tasks || [];
-  if (tasks.length === 0) {
-    return alert("任務庫尚無任務，請先至任務設定新增！");
-  }
-
-  let activeIds = getDailyActiveTasks();
-  let completedList = data.taskStatus.completed || [];
+function replaceSingleTask(taskId) {
+  getDailyActiveTasks();
   
-  if (activeIds.length > 0 && completedList.length >= activeIds.length) {
-    return alert("今日任務已全部完成，無法再進行重骰！");
+  if ((data.taskStatus.completed || []).includes(taskId)) {
+    return alert("已完成的任務不能替換！");
   }
 
-  if (completedList.length > 0) {
-    let cost = Number(data.taskRerollCost ?? 10);
-    if (!confirm(`目前任務已有進度，重骰將會使「已完成進度全部重來」並扣除 ${money(cost)}，確定要重骰嗎？`)) {
-      return;
-    }
+  if ((data.taskStatus.replacedIds || []).includes(taskId)) {
+    return alert("此任務已經替換過了（每個任務僅限替換一次）！");
   }
 
-  let cost = Number(data.taskRerollCost ?? 10);
-  if (data.balance < cost) {
-    return alert(`金庫額度不足 ${money(cost)}，無法進行重骰！`);
+  let tasks = data.tasks || [];
+  let activeIds = data.taskStatus.activeIds;
+
+  let availablePool = tasks.filter(t => !activeIds.includes(t.id));
+  if (availablePool.length === 0) {
+    return alert("任務庫中沒有其他備用任務可供替換！");
   }
 
-  if (cost > 0) {
-    data.balance -= cost;
-    data.spent += cost;
-    if (!data.logs) data.logs = [];
-    data.logs.push({
-      amount: -cost,
-      note: "🎲 重骰每日任務",
-      date: new Date().toLocaleString("zh-TW")
-    });
+  let randomNewTask = availablePool[Math.floor(Math.random() * availablePool.length)];
+
+  let index = activeIds.indexOf(taskId);
+  if (index > -1) {
+    activeIds[index] = randomNewTask.id;
   }
 
-  let copyPool = [...tasks].sort(() => Math.random() - 0.5);
-  let pickCount = Math.min(3, copyPool.length);
-  let newActiveIds = copyPool.slice(0, pickCount).map(t => t.id);
-
-  data.taskStatus = {
-    date: getCustomDayStr(),
-    activeIds: newActiveIds,
-    completed: []
-  };
+  data.taskStatus.replacedIds.push(randomNewTask.id);
 
   save();
 }
@@ -1141,24 +1134,18 @@ function completeTask(taskId) {
 function renderTasks() {
   let activeIds = getDailyActiveTasks();
   let container = document.getElementById("taskList");
-  let rerollBtn = document.getElementById("rerollTaskBtn");
 
   if (!container) return;
 
   let tasks = data.tasks || [];
   let activeTasks = activeIds.map(id => tasks.find(t => t.id === id)).filter(Boolean);
   let completedList = data.taskStatus.completed || [];
+  let replacedList = data.taskStatus.replacedIds || [];
 
   document.getElementById("allTaskRewardText").textContent = money(data.allTaskReward ?? 100);
   document.getElementById("taskProgressText").textContent = `${completedList.length} / ${activeTasks.length}`;
   let percent = activeTasks.length ? (completedList.length / activeTasks.length) * 100 : 0;
   document.getElementById("taskProgressBar").style.width = percent + "%";
-
-  if (rerollBtn) {
-    let isAllDone = activeTasks.length > 0 && completedList.length >= activeTasks.length;
-    rerollBtn.disabled = isAllDone;
-    rerollBtn.title = isAllDone ? "今日任務已全部完成，無法重骰" : "重骰任務";
-  }
 
   if (activeTasks.length === 0) {
     container.innerHTML = `<div class="empty" style="padding:10px 0;font-size:0.68rem">任務庫少於 3 個任務</div>`;
@@ -1167,12 +1154,26 @@ function renderTasks() {
 
   container.innerHTML = activeTasks.map(t => {
     let isDone = completedList.includes(t.id);
+    let isReplaced = replacedList.includes(t.id);
+    
+    let replaceBtnHtml = "";
+    if (!isDone) {
+      if (isReplaced) {
+        replaceBtnHtml = `<button class="task-replace-btn" disabled style="opacity:0.4;cursor:not-allowed;" title="已替換過">已替換</button>`;
+      } else {
+        replaceBtnHtml = `<button class="task-replace-btn" onclick="replaceSingleTask(${t.id})" title="替換新任務（僅限一次）">換新</button>`;
+      }
+    }
+
     return `
       <div class="task-item ${isDone ? 'done' : ''}" style="padding:5px 8px;margin-bottom:4px">
         <div class="task-title" style="font-size:0.68rem" title="${esc(t.title)}">${esc(t.title)}</div>
-        <button class="task-btn ${isDone ? 'completed' : ''}" style="padding:3px 6px;font-size:0.62rem" ${isDone ? 'disabled' : ''} onclick="completeTask(${t.id})">
-          ${isDone ? '✓' : '完成'}
-        </button>
+        <div style="display:flex;gap:4px;align-items:center;flex-shrink:0;">
+          ${replaceBtnHtml}
+          <button class="task-btn ${isDone ? 'completed' : ''}" style="padding:3px 6px;font-size:0.62rem" ${isDone ? 'disabled' : ''} onclick="completeTask(${t.id})">
+            ${isDone ? '✓' : '完成'}
+          </button>
+        </div>
       </div>
     `;
   }).join("");
@@ -1193,7 +1194,6 @@ function renderCheckin() {
   let today = getCustomDayStr();
   let currentYearMonth = today.slice(0, 7); // "YYYY-MM"
 
-  // 跨月份自動歸零一個月簽到進度
   if (data.checkin.monthRecordDate !== currentYearMonth) {
     data.checkin.monthCount = 0;
     data.checkin.monthRecordDate = currentYearMonth;
@@ -1211,12 +1211,10 @@ function renderCheckin() {
     retroBtn.style.display = canRetro ? "block" : "none";
   }
 
-  // 7天連續簽到進度條
   progressText.textContent = `${count} / 7 天`;
   let percent = Math.min(100, (count / 7) * 100);
   progressBar.style.width = percent + "%";
 
-  // 一個月簽到總進度條（以 30 天為滿分基準）
   let maxMonthDays = 30;
   monthProgressText.textContent = `${monthCount} / ${maxMonthDays} 天`;
   let monthPercent = Math.min(100, (monthCount / maxMonthDays) * 100);
@@ -1441,7 +1439,6 @@ function renderCatManageList() {
 function openTaskModal() {
   document.getElementById("taskModal").classList.add("open");
   document.getElementById("allTaskRewardInput").value = fromTWD(data.allTaskReward ?? 100);
-  document.getElementById("taskRerollCostInput").value = fromTWD(data.taskRerollCost ?? 10);
   renderTaskManageList();
 }
 function closeTaskModal() { document.getElementById("taskModal").classList.remove("open"); }
@@ -1455,17 +1452,6 @@ function saveTaskReward() {
   save();
   renderTasks();
   alert("獎勵設定已儲存！");
-}
-
-function saveTaskRerollCost() {
-  let valStr = document.getElementById("taskRerollCostInput").value;
-  if (valStr === "") return alert("請輸入扣除金額！");
-  let val = Number(valStr);
-  if (isNaN(val) || val < 0) return alert("請輸入有效的金額（不可為負數）！");
-  data.taskRerollCost = toTWD(val);
-  save();
-  renderTasks();
-  alert("任務重骰費用已儲存！");
 }
 
 function addTask() {
@@ -1854,3 +1840,6 @@ document.addEventListener("DOMContentLoaded", () => {
 </script>
 </body>
 </html>
+```[cite: 9]
+
+```
