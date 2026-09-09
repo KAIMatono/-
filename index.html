@@ -362,7 +362,10 @@ body.force-desktop .checkin-task-compact h2 { font-size: 1.12rem !important; mar
           <div>
             <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
               <h2 style="margin:0">🎯 課金目標</h2>
-              <button style="padding:3px 6px;font-size:0.68rem" onclick="openModal('goal')">＋ 新增</button>
+              <div style="display:flex;gap:4px">
+                <button style="padding:3px 6px;font-size:0.68rem;background:var(--accent)" onclick="openAllGoalsModal()">🔍 </button>
+                <button style="padding:3px 6px;font-size:0.68rem" onclick="openModal('goal')">＋ 新增</button>
+              </div>
             </div>
             <div id="goals" class="goal-scroll-area"></div>
           </div>
@@ -372,7 +375,10 @@ body.force-desktop .checkin-task-compact h2 { font-size: 1.12rem !important; mar
           <div>
             <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
               <h2 style="margin:0">📜 最近紀錄</h2>
-              <button onclick="clearAllLogs()" style="padding:3px 6px;font-size:0.68rem;background:#4a2032;color:#ffb1c5">清空</button>
+              <div style="display:flex;gap:4px">
+                <button style="padding:3px 6px;font-size:0.68rem;background:var(--accent)" onclick="openAllLogsModal()">🔍 </button>
+                <button onclick="clearAllLogs()" style="padding:3px 6px;font-size:0.68rem;background:#4a2032;color:#ffb1c5">清空</button>
+              </div>
             </div>
             <div class="log log-scroll-area" id="log"></div>
           </div>
@@ -491,6 +497,24 @@ body.force-desktop .checkin-task-compact h2 { font-size: 1.12rem !important; mar
  </div>
 </div>
 
+<!-- 詳細課金目標瀏覽對話框 -->
+<div class="modal" id="allGoalsModal">
+ <div class="modalbox" style="width:min(560px, 100%);">
+   <h3>🎯 所有課金目標詳細列表</h3>
+   <div id="allGoalsList" style="max-height: 60vh; overflow-y: auto; display: flex; flex-direction: column; gap: 8px; margin-top: 10px;"></div>
+   <div class="modalactions" style="margin-top:20px"><button onclick="closeAllGoalsModal()">關閉</button></div>
+ </div>
+</div>
+
+<!-- 完整歷史紀錄瀏覽對話框 -->
+<div class="modal" id="allLogsModal">
+ <div class="modalbox" style="width:min(560px, 100%);">
+   <h3>📜 完整歷史紀錄詳細列表</h3>
+   <div id="allLogsList" style="max-height: 60vh; overflow-y: auto; display: flex; flex-direction: column; gap: 8px; margin-top: 10px;"></div>
+   <div class="modalactions" style="margin-top:20px"><button onclick="closeAllLogsModal()">關閉</button></div>
+ </div>
+</div>
+
 <!-- 分類與背景設定對話框 -->
 <div class="modal" id="catModal">
  <div class="modalbox">
@@ -570,10 +594,7 @@ body.force-desktop .checkin-task-compact h2 { font-size: 1.12rem !important; mar
    <h3>⚙️ 每日任務設定</h3>
    <div class="field">
      <label>完成每日全部 3 個任務總獎勵 (<span class="curr-unit">NT$</span>)</label>
-     <div style="display:flex;gap:8px">
-       <input id="allTaskRewardInput" type="number" min="0" placeholder="例如：100" style="flex:1">
-       <button class="primary" onclick="saveTaskReward()">儲存獎勵</button>
-     </div>
+     <input id="allTaskRewardInput" type="number" min="0" placeholder="例如：100" oninput="autoSaveTaskReward(this.value)">
    </div>
 
    <hr style="border:0;border-top:1px solid var(--line);margin:16px 0">
@@ -1043,7 +1064,7 @@ function renderDutyMembers() {
     }).join("");
     container.innerHTML = `<div class="duty-grid">${cardsHtml}</div>`;
   } else {
-    container.innerHTML = `<div class="empty">尚無成員照片，點擊右上角「管理成員」上傳吧！</div>`;
+    container.innerHTML = `<div class="empty">尚無成員照片，點擊右上角“管理成員”上傳吧！</div>`;
   }
 }
 
@@ -1063,6 +1084,7 @@ function getDailyActiveTasks() {
     let pickCount = Math.min(3, copyPool.length);
     let activeIds = copyPool.slice(0, pickCount).map(t => t.id);
     
+    // 每日切換時，預設所有任務皆尚未替換過
     data.taskStatus = { date: today, activeIds: activeIds, completed: [], replacedIds: [] };
   }
   if (!data.taskStatus.replacedIds) {
@@ -1383,7 +1405,7 @@ function render() {
   let goalsContainer = document.getElementById("goals");
   if (goalsContainer) {
     let visibleGoals = (data.goals || []).map((g, i) => ({ ...g, _i: i })).filter(g => filter === "all" || g.game === filter);
-    goalsContainer.innerHTML = visibleGoals.length ? visibleGoals.map((g) => {
+    goalsContainer.innerHTML = visibleGoals.length ? visibleGoals.slice(0, 5).map((g) => {
       let p = Math.min(100, (g.current / g.target) * 100);
       let imgHtml = g.img ? `<img src="${g.img}" class="thumb">` : '';
       let catNameStr = gameName(g.game);
@@ -1394,12 +1416,65 @@ function render() {
   let logContainer = document.getElementById("log");
   if (logContainer) {
     let visibleLogs = (data.logs || []).map((l, i) => ({ ...l, _i: i })).filter(l => filter === "all" || !l.game || l.game === filter);
-    logContainer.innerHTML = visibleLogs.length ? visibleLogs.slice().reverse().map(l => {
+    logContainer.innerHTML = visibleLogs.length ? visibleLogs.slice().reverse().slice(0, 5).map(l => {
       let imgHtml = l.img ? `<img src="${l.img}" class="thumb">` : '';
       let catNameStr = gameName(l.game);
       return `<div class="logrow"><div style="display:flex;gap:8px;align-items:center;min-width:0;flex:1">${imgHtml}<div style="min-width:0;flex:1"><b>${catNameStr ? catNameStr + " · " : ""}${esc(l.note || l.type)}</b><div class="muted">${l.date}</div></div></div><div style="display:flex;align-items:center;gap:6px;flex-shrink:0"><b class="${l.amount > 0 ? 'plus' : 'minus'}">${l.amount > 0 ? '+' : ''}${money(l.amount)}</b><button class="btn-del" onclick="deleteLog(${l._i})">✕</button></div></div>`;
     }).join("") : '<div class="empty">還沒有紀錄。</div>';
+}
+}
+
+function openAllGoalsModal() {
+  document.getElementById("allGoalsModal").classList.add("open");
+  renderAllGoalsList();
+}
+function closeAllGoalsModal() {
+  document.getElementById("allGoalsModal").classList.remove("open");
+  render();
+}
+function renderAllGoalsList() {
+  let container = document.getElementById("allGoalsList");
+  if (!container) return;
+  let filter = selectedGame();
+  let visibleGoals = (data.goals || []).map((g, i) => ({ ...g, _i: i })).filter(g => filter === "all" || g.game === filter);
+  
+  if (!visibleGoals.length) {
+    container.innerHTML = '<div class="empty">還沒有課金目標。</div>';
+    return;
   }
+  
+  container.innerHTML = visibleGoals.map((g) => {
+    let p = Math.min(100, (g.current / g.target) * 100);
+    let imgHtml = g.img ? `<img src="${g.img}" class="thumb">` : '';
+    let catNameStr = gameName(g.game);
+    return `<div class="goal"><div style="display:flex;gap:8px;align-items:center;flex:1;min-width:0">${imgHtml}<div style="min-width:0;flex:1"><div class="goal-name">${catNameStr ? catNameStr + " · " : ""}${esc(g.name)}</div><div class="muted">${money(g.current)} / ${money(g.target)}</div><div class="bar goal-bar" style="height:6px;background:#2d3754;border-radius:99px;margin-top:4px"><div class="fill" style="width:${p}%;height:100%;background:linear-gradient(90deg,#7d6cff,#c29cff);border-radius:99px"></div></div></div></div><div style="flex-shrink:0"><button class="primary" onclick="openFundModal(${g._i}); closeAllGoalsModal();">目標</button><button class="btn-del" onclick="deleteGoal(${g._i}); renderAllGoalsList();">✕</button></div></div>`;
+  }).join("");
+}
+
+function openAllLogsModal() {
+  document.getElementById("allLogsModal").classList.add("open");
+  renderAllLogsList();
+}
+function closeAllLogsModal() {
+  document.getElementById("allLogsModal").classList.remove("open");
+  render();
+}
+function renderAllLogsList() {
+  let container = document.getElementById("allLogsList");
+  if (!container) return;
+  let filter = selectedGame();
+  let visibleLogs = (data.logs || []).map((l, i) => ({ ...l, _i: i })).filter(l => filter === "all" || !l.game || l.game === filter);
+
+  if (!visibleLogs.length) {
+    container.innerHTML = '<div class="empty">還沒有紀錄。</div>';
+    return;
+  }
+
+  container.innerHTML = visibleLogs.slice().reverse().map(l => {
+    let imgHtml = l.img ? `<img src="${l.img}" class="thumb">` : '';
+    let catNameStr = gameName(l.game);
+    return `<div class="logrow"><div style="display:flex;gap:8px;align-items:center;min-width:0;flex:1">${imgHtml}<div style="min-width:0;flex:1"><b>${catNameStr ? catNameStr + " · " : ""}${esc(l.note || l.type)}</b><div class="muted">${l.date}</div></div></div><div style="display:flex;align-items:center;gap:6px;flex-shrink:0"><b class="${l.amount > 0 ? 'plus' : 'minus'}">${l.amount > 0 ? '+' : ''}${money(l.amount)}</b><button class="btn-del" onclick="deleteLog(${l._i}); renderAllLogsList();">✕</button></div></div>`;
+  }).join("");
 }
 
 function openCatModal() {
@@ -1442,15 +1517,13 @@ function openTaskModal() {
 }
 function closeTaskModal() { document.getElementById("taskModal").classList.remove("open"); }
 
-function saveTaskReward() {
-  let valStr = document.getElementById("allTaskRewardInput").value;
-  if (valStr === "") return alert("請輸入獎勵金額！");
+function autoSaveTaskReward(valStr) {
+  if (valStr === "") return;
   let val = Number(valStr);
-  if (isNaN(val) || val < 0) return alert("請輸入有效的獎勵金額（不可為負數）！");
+  if (isNaN(val) || val < 0) return;
   data.allTaskReward = toTWD(val);
   save();
   renderTasks();
-  alert("獎勵設定已儲存！");
 }
 
 function addTask() {
