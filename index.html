@@ -299,7 +299,7 @@ body.force-desktop .checkin-task-compact h2 { font-size: 1.12rem !important; mar
 <div class="app">
   <!-- 標題區塊 -->
   <div class="top" style="flex-direction: column; align-items: stretch; gap: 8px;">
-    <!-- 第一行：課金金庫、切換為電腦版、幣值、遊戲類別 -->
+    <!-- 第一行：課金金庫、版本切換按鈕、貨幣切換按鈕、匯率更新按鈕(日圓匯率) -->
     <div style="display: flex; justify-content: space-between; align-items: center; width: 100%; flex-wrap: nowrap; gap: 6px;">
       <div class="brand" style="font-size: 1.25rem; white-space: nowrap;">🎮 課金<span>金庫</span></div>
       <div style="display: flex; gap: 4px; align-items: center; flex-wrap: nowrap;">
@@ -308,13 +308,14 @@ body.force-desktop .checkin-task-compact h2 { font-size: 1.12rem !important; mar
           <option value="TWD">NT$</option>
           <option value="JPY">￥</option>
         </select>
-        <select id="gameFilter" onchange="render()" style="padding:8px 6px;border-radius:12px;border:1px solid var(--line);background:var(--card2);color:white;font-weight:700;font-size:0.81rem;max-width:110px;">
-        </select>
+        <button id="rateBtn" onclick="fetchBotRate()" title="更新匯率" style="background:var(--card2);padding:8px 10px;font-size:0.81rem;white-space:nowrap;">🔄 更新匯率(0.21)</button>
       </div>
     </div>
 
-    <!-- 第二行：字體大小切換按鈕組、上一步、設定、歸零、重置 -->
+    <!-- 第二行：遊戲分類、字體大小、上一步、設定、歸零、重置 -->
     <div style="display: flex; gap: 4px; align-items: center; justify-content: flex-end; width: 100%; flex-wrap: nowrap; overflow-x: auto;">
+      <select id="gameFilter" onchange="render()" style="padding:8px 6px;border-radius:12px;border:1px solid var(--line);background:var(--card2);color:white;font-weight:700;font-size:0.81rem;max-width:130px;flex-shrink:0;">
+      </select>
       <div style="display: inline-flex; background: var(--card2); border-radius: 12px; padding: 2px; border: 1px solid var(--line); flex-shrink: 0;">
         <button id="fontShrinkBtn" onclick="setFontScale(0)" style="background: transparent; border-radius: 10px; padding: 6px 8px; font-size: 0.78rem;" title="字體縮小">小</button>
         <button id="fontDefaultBtn" onclick="setFontScale(1)" style="background: transparent; border-radius: 10px; padding: 6px 8px; font-size: 0.78rem;" title="預設字體">中</button>
@@ -325,12 +326,6 @@ body.force-desktop .checkin-task-compact h2 { font-size: 1.12rem !important; mar
       <button onclick="resetBalanceToZero()" style="background:#4a3220;color:#ffd36a;padding:8px 10px;font-size:0.81rem;white-space:nowrap;flex-shrink:0;">歸零</button>
       <button onclick="resetAll()" style="padding:8px 10px;font-size:0.81rem;white-space:nowrap;flex-shrink:0;">重置</button>
     </div>
-  </div>
-
-  <!-- 匯率提示資訊條 -->
-  <div style="font-size:0.75rem;color:var(--muted);margin-bottom:12px;display:flex;justify-content:space-between;align-items:center;background:#151a2b;padding:6px 12px;border-radius:8px;border:1px solid var(--line)">
-    <span>🏦 台灣銀行日幣現鈔賣出匯率：<b id="rateDisplay" style="color:var(--gold)">1 JPY ≈ 0.21 TWD</b></span>
-    <button onclick="fetchBotRate()" style="padding:2px 8px;font-size:0.68rem;background:none;border:1px solid var(--line);color:var(--muted)">🔄 更新匯率</button>
   </div>
 
   <div class="grid">
@@ -795,8 +790,8 @@ async function fetchBotRate() {
         const rate = parseFloat(parts[12] || parts[13]);
         if (!isNaN(rate) && rate > 0) {
           data.jpyRate = rate;
-          updateRateDisplay();
           save();
+          updateRateButtonText();
           return;
         }
       }
@@ -804,13 +799,13 @@ async function fetchBotRate() {
   } catch (e) {
     console.warn("無法取得最新台銀匯率，使用備用匯率", e);
   }
-  updateRateDisplay();
+  updateRateButtonText();
 }
 
-function updateRateDisplay() {
-  let rateEl = document.getElementById("rateDisplay");
-  if (rateEl) {
-    rateEl.textContent = `1 JPY ≈ ${data.jpyRate.toFixed(4)} TWD`;
+function updateRateButtonText() {
+  let rateBtn = document.getElementById("rateBtn");
+  if (rateBtn) {
+    rateBtn.textContent = `🔄 更新匯率(${data.jpyRate})`;
   }
 }
 
@@ -845,7 +840,7 @@ function undo() {
   updateUndoBtn();
   updateDropdowns();
   updateCurrencyUnitUI();
-  updateRateDisplay();
+  updateRateButtonText();
   render();
   renderMemberList();
   renderCatManageList();
@@ -867,7 +862,7 @@ function updateDropdowns() {
   let currentFilter = filterSelect.value;
   let currentModal = modalSelect.value;
 
-  let filterOpts = `<option value="all">全部</option>` + 
+  let filterOpts = `<option value="all">全部分類</option>` + 
     data.categories.map(c => `<option value="${c.id}">${esc(c.name)}</option>`).join("");
   
   let modalOpts = data.categories.map(c => `<option value="${c.id}">${esc(c.name)}</option>`).join("");
@@ -1382,6 +1377,7 @@ function render() {
   let filter = selectedGame();
   updateBackground(filter);
   updateCurrencyUnitUI();
+  updateRateButtonText();
 
   const balanceEl = document.getElementById("balance");
   if (balanceEl) balanceEl.textContent = money(data.balance);
