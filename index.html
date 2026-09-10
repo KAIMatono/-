@@ -1908,6 +1908,13 @@ document.addEventListener("DOMContentLoaded", () => {
   applyFontSize();
   fetchBotRate();
   render();
+
+  // 監聽網頁可見性狀態，當網頁從背景回到前景（如透過 iOS 桌面捷徑點開）時自動重新整理
+  document.addEventListener("visibilitychange", function() {
+    if (document.visibilityState === "visible") {
+      location.reload(); 
+    }
+  });
 });
 </script>
 </body>
